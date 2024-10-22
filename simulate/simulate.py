@@ -8,6 +8,7 @@ class RecordingGenerator():
                  first_AP_stim_lambda_ms = 1, # Exponential
                  AP_length_mean_std_ms = [2, 0.1], # Gaussian
                  AP_amplitude_mean_std_pct = [1, 1], # Gaussian
+                 SA_amplitude_mean_std_pct = [1, 0.1], # Gaussian
                  num_cells = 10, # Poisson # num_spike trains
                  spike_train_start_lambda_ms = 1, # Exponential # first spike after begining of SA
                  spike_train_rate_lambda = 1, # Poisson # number of spikes per spike train
@@ -21,6 +22,7 @@ class RecordingGenerator():
         self.first_AP_stim_lambda_ms = first_AP_stim_lambda_ms
         self.AP_length_mean_std_ms = AP_length_mean_std_ms
         self.AP_amplitude_mean_std_pct = AP_amplitude_mean_std_pct
+        self.SA_amplitude_mean_std_pct = SA_amplitude_mean_std_pct
         self.num_cells = num_cells
         self.spike_train_start_lambda_ms = spike_train_start_lambda_ms
         self.spike_train_rate_lambda = spike_train_rate_lambda
@@ -77,11 +79,13 @@ class RecordingGenerator():
         data = np.zeros(num_stimuli*segment_length)
         values = []
         indexes = []
-
+        SA_template = self.SA_templates[np.random.choice(len(self.SA_templates)), :]
         for i in range(num_stimuli):
             if verbose: print(f"Stimulus {i}")
-            SA_template = self.SA_templates[np.random.choice(len(self.SA_templates)), :]
+            
             SA, _ = self.interp_template(SA_template, 10) # add time jitter
+            SA_amplitude = np.random.normal(*self.SA_amplitude_mean_std_pct)
+            SA *= SA_amplitude
             
             start_SA = i*segment_length
             end_SA = start_SA + self.SA_length
@@ -169,7 +173,8 @@ if __name__ == "__main__":
     rec = RecordingGenerator(
         first_AP_stim_lambda_ms = 0.2,
         AP_length_mean_std_ms = [5, 1],
-        AP_amplitude_mean_std_pct = [1, 0.5],
+        AP_amplitude_mean_std_pct = [10, 0.5],
+        SA_amplitude_mean_std_pct = [1, 0.1],
         num_cells = 50,
         spike_train_start_lambda_ms = 1,
         spike_train_rate_lambda = 3,
@@ -178,12 +183,12 @@ if __name__ == "__main__":
         template_jitter_ms = 1, 
         )
     
-    segments, segment_idxs, data = rec.generate(2, verbose=0)
+    segments, segment_idxs, data = rec.generate(3, verbose=0)
     noised_data = rec.add_white_noise(data, SNR_dB=20)
     noised_data = rec.add_mains_electricity_noise(noised_data, SNR_dB=20)
     noised_data = rec.add_spontaneous_spikes(noised_data, firing_Hz=1000)
 
-    #plt.plot(noised_data, label='noised_data')
+    plt.plot(noised_data, label='noised_data')
     plt.plot(data, label='data', color='orange')
     plt.legend()
     plt.show()
