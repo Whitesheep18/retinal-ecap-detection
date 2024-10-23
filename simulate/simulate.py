@@ -58,12 +58,19 @@ class RecordingGenerator():
         
         num_points = int(self.fs*template_length_ms//1000)
         random_jitter = np.random.uniform(-self.template_jitter_ms/2, self.template_jitter_ms/2)
-        time_new_ms = np.linspace(self.template_jitter_ms+random_jitter, 
-                                  template_length_ms-self.template_jitter_ms + random_jitter, 
+        time_new_ms = np.linspace(self.template_jitter_ms/2+random_jitter, 
+                                  template_length_ms-self.template_jitter_ms/2 + random_jitter, 
                                   num_points)
-
         interp_func = interp1d(time_old_ms, template, kind='cubic')
-        interp_template = interp_func(time_new_ms)
+        try:
+            interp_template = interp_func(time_new_ms)
+        except Exception as e:
+            print(template_length_ms)
+            print(self.template_jitter_ms)
+            print(random_jitter)
+            print(time_old_ms)
+            print(time_new_ms)
+            interp_template = interp_func(time_new_ms)
         
         return interp_template, time_new_ms
     
@@ -103,7 +110,7 @@ class RecordingGenerator():
             for cell_idx in range(num_cells):
                 if verbose: print(f"Spike train {cell_idx}")
 
-                start_idx = int(np.random.exponential(self.spike_train_start_lambda_ms) / 1000 * self.fs) + end_SA
+                start_idx = int(np.ceil(np.random.exponential(self.spike_train_start_lambda_ms) / 1000 * self.fs) + end_SA)
                 num_spikes = np.random.poisson(self.spike_train_rate_lambda)
                 AP_template = self.AP_templates[np.random.choice(len(self.AP_templates)), :]
 
@@ -111,6 +118,7 @@ class RecordingGenerator():
                     if verbose: print(f"Spike {spike_idx}")
 
                     AP_template_length_ms = np.random.normal(*self.AP_length_mean_std_ms)
+                    AP_template_length_ms = np.max([AP_template_length_ms, self.template_jitter_ms*2])
                     AP, _ = self.interp_template(AP_template, AP_template_length_ms)
                     AP_amplitude = np.random.normal(*self.AP_amplitude_mean_std_pct)
                     AP *= AP_amplitude
@@ -189,7 +197,7 @@ if __name__ == "__main__":
         template_jitter_ms = 1, 
         )
     
-    SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(4, verbose=0)
+    SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(3, verbose=0)
     noised_data = rec.add_white_noise(data, SNR_dB=20)
     noised_data = rec.add_mains_electricity_noise(noised_data, SNR_dB=20)
     noised_data = rec.add_spontaneous_spikes(noised_data, firing_Hz=1000)
@@ -207,19 +215,25 @@ if __name__ == "__main__":
     plt.title('Amount of spikes present at an index')
     plt.show()
 
-    
+    # order APs and AP_indexes by start index in AP_indexes
 
-    # get samples for training
+    #order = np.argsort([idx[0] for idx in AP_indexes])
+    #APs = [APs[i] for i in order]
+    #AP_indexes = [AP_indexes[i] for i in order]
+    #AP_indexes_start = [idx[0] for idx in AP_indexes]
+    #AP_indexes_end = [idx[-1] for idx in AP_indexes]
+
+    # get samples for training 
 
     fig, axs = plt.subplots(2, 1, figsize=(10, 10))
 
     SA_ends = [idx[-1] for idx in SA_indexes]
 
     SA_size = len(SA_indexes[0])
-    num_samples = 100
+    num_samples = 300
     window_size = 200
     window_offset = 50
-    X, y = np.zeros((num_samples, window_size)), np.zeros(num_samples)
+    X, y_class, y_reg = np.zeros((num_samples, window_size)), np.zeros(num_samples), np.zeros(num_samples)
     i = 0
     while i < num_samples:
         for SA_end_idx in range(len(SA_ends)-1):
@@ -230,13 +244,18 @@ if __name__ == "__main__":
             while window_start < SA_ends[SA_end_idx+1]-SA_size-window_size:
                 if i >= num_samples: break
                 X[i] = noised_data[window_start:window_start+window_size]
-                y[i] = is_spike[window_start: window_start+window_size].mean() > 0.90 # is more than 90% of the samples in this window are spikes
-                if y[i]:
+                # if more than 90% of the samples in this window are spikes then it is a spiking window
+                y_class[i] = is_spike[window_start: window_start+window_size].mean() > 0.90 
+                # count spikes fully contained in this window
+                y_reg[i] = len([x for x in AP_indexes if x[0] >= window_start and x[-1] <= window_start+window_size]) # TODO: this might be slow
+                if y_reg[i]:
                     axs[0].plot(X[i], alpha=0.2, color='olive')
                 else:
                     axs[1].plot(X[i], alpha=0.2, color='pink')
                 window_start += window_offset
                 i += 1
+
+    print("Samples found:", i)
 
     axs[0].set_ylim(-800, 800)
     axs[0].set_title('Spike')
@@ -245,7 +264,12 @@ if __name__ == "__main__":
     plt.show()
 
     np.save('X.npy', X)
-    np.save('y.npy', y)
+    np.save('y_class.npy', y_class)
+    np.save('x_reg.npy', y_reg)
     
+    plt.plot(y_reg)
+    plt.xlabel('Window id')
+    plt.ylabel('Num. fully contained spikes')
+    plt.show()
         
             
