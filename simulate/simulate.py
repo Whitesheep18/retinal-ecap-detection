@@ -179,7 +179,7 @@ if __name__ == "__main__":
     rec = RecordingGenerator(
         first_AP_stim_lambda_ms = 0.2,
         AP_length_mean_std_ms = [5, 1],
-        AP_amplitude_mean_std_pct = [10, 0.5],
+        AP_amplitude_mean_std_pct = [5, 0.5],
         SA_amplitude_mean_std_pct = [1, 0.1],
         num_cells = 50,
         spike_train_start_lambda_ms = 1,
@@ -189,7 +189,7 @@ if __name__ == "__main__":
         template_jitter_ms = 1, 
         )
     
-    SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(4, verbose=0)
+    SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(20, verbose=0)
     noised_data = rec.add_white_noise(data, SNR_dB=20)
     noised_data = rec.add_mains_electricity_noise(noised_data, SNR_dB=20)
     noised_data = rec.add_spontaneous_spikes(noised_data, firing_Hz=1000)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     SA_ends = [idx[-1] for idx in SA_indexes]
 
     SA_size = len(SA_indexes[0])
-    num_samples = 100
+    num_samples = 2000
     window_size = 200
     window_offset = 50
     X, y = np.zeros((num_samples, window_size)), np.zeros(num_samples)
@@ -244,8 +244,11 @@ if __name__ == "__main__":
     axs[1].set_title('Not spike')
     plt.show()
 
-    np.save('X.npy', X)
-    np.save('y.npy', y)
+    # np.save('X_10000.npy', X)
+    # np.save('y_10000.npy', y)
+
+    print(len(X),len(y))
+    print(sum(y))
     
         
             
