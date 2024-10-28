@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "retinal-ecap-detection"
+version = "0.0.1"
+description = "Retinal ECAP detection"
+authors = [
+  { name = "Anna Reisz", email = "s220817@dtu.dk" },
+]
+
+readme = "README.md"
+requires-python = "~=3.11"
+dynamic = ["dependencies"]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
