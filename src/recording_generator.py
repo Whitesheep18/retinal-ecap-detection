@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+import copy
+from src.utils import get_template
 
 
 class RecordingGenerator():
@@ -15,9 +17,9 @@ class RecordingGenerator():
                  inter_spike_train_interval_lambda_ms = 1, # Exponential
                  CAP_jitter_mean_std_ms = [1, 0.1], # Gaussian
                  template_jitter_ms = 0.01, # Uniform (width)
-                 SA_templates = 'SA_templates.npy',
-                 AP_templates = 'AP_templates.npy',
-                 ME_template  = 'ME_template.npy',
+                 SA_templates = None,
+                 AP_templates = None,
+                 ME_template  = None
                  ):
         self.first_AP_stim_lambda_ms = first_AP_stim_lambda_ms
         self.AP_length_mean_std_ms = AP_length_mean_std_ms
@@ -32,12 +34,9 @@ class RecordingGenerator():
 
         self.fs = 30_000 # 30 kHz
 
-        self.SA_templates = self._set_template(SA_templates) # 300 points, 30 kHz
-        print(self.SA_templates.shape)
-        self.AP_templates = self._set_template(AP_templates) # variable sampling rate
-        print(self.AP_templates.shape)
-        self.ME_template  = self._set_template(ME_template)  # 600 points, 30 kHz   
-        print(self.ME_template.shape)     
+        self.SA_templates = get_template('SA') if SA_templates is None else self._set_template(SA_templates) # 300 points, 30 kHz
+        self.AP_templates = get_template('AP') if AP_templates is None else self._set_template(AP_templates) # variable sampling rate
+        self.ME_template  = get_template('ME') if ME_template is None else self._set_template(ME_template)  # 600 points, 30 kHz   
 
         # should start with 0 and end with 0
         self.AP_templates = np.concatenate([np.zeros((len(self.AP_templates), 1)), 
@@ -181,7 +180,7 @@ class RecordingGenerator():
             start_idx = np.random.randint(len(data) - len(AP))
             data[start_idx: start_idx + len(AP)] += AP
         return data
-
+    
 if __name__ == "__main__":
                 
     rec = RecordingGenerator(
@@ -216,12 +215,6 @@ if __name__ == "__main__":
     plt.show()
 
     # order APs and AP_indexes by start index in AP_indexes
-
-    #order = np.argsort([idx[0] for idx in AP_indexes])
-    #APs = [APs[i] for i in order]
-    #AP_indexes = [AP_indexes[i] for i in order]
-    #AP_indexes_start = [idx[0] for idx in AP_indexes]
-    #AP_indexes_end = [idx[-1] for idx in AP_indexes]
 
     # get samples for training 
 
