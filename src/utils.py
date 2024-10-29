@@ -30,3 +30,13 @@ def get_signal_by_type(path_to_data='../data', eye=1, design='3D', experiment='T
     if verbose: 
         print(f"Reading {file}")
     return get_signal(filepath=f'{path}/{file}', verbose=verbose)
+
+def get_template(template_type, path_to_templates = '../simulate'):
+    if template_type == 'SA':
+        return np.load(f"{path_to_templates}/SA_templates.npy")
+    elif template_type == 'ME':
+        return np.load(f"{path_to_templates}/ME_template.npy")
+    elif template_type == 'AP':
+        return np.load(f"{path_to_templates}/AP_templates.npy")
+    else:
+        raise Exception(f"Template {template_type} not found. Use either 'SA', 'ME' or 'AP'")
