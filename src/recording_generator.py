@@ -148,21 +148,18 @@ class RecordingGenerator():
         noise = np.random.normal(0, np.sqrt(noise_power), len(data))
         return data + noise
     
-    def add_mains_electricity_noise(self, data, ME_template=None, SNR_dB=10):
+    def add_mains_electricity_noise(self, data, ME_template=None, amplitude_scaler=1):
         """
         Adds mains electricity noise to the data
         """
-        # TODO: interpolate ME_template
+
         if ME_template is None:
             ME_template = self.ME_template
         ME = np.tile(ME_template.flatten(), len(data)//len(ME_template) + 1)
+        ME = np.roll(ME, np.random.randint(len(ME))) # random phase
         ME = ME[:len(data)]
-        # amplify to match SNR
-        ME_power = np.mean(ME**2)
-        data_power = np.mean(data**2)
-        ME *= np.sqrt(data_power / ME_power / 10**(SNR_dB/10))
-        # random phase
-        ME = np.roll(ME, np.random.randint(len(ME)))
+        ME *= amplitude_scaler
+        ME, _ = self.interp_template(ME, len(ME)/self.fs*1000) # jitter
         
         return data + ME
     
