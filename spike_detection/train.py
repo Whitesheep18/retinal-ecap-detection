@@ -54,7 +54,7 @@ if __name__ == "__main__":
             f.write(f"{dt.datetime.now()},{model},{mse},{r2}\n")
         
         if args.save_model_path != "False":
-            model_path = os.path.join(args.save_model_path, f"{model}_{args.dataset}.pkl")
+            model_path = os.path.join(args.save_model_path, f"{model}_{os.path.basename(args.dataset)}.pkl")
             print('Saving model to', model_path)
             with open(model_path, "wb") as f:
                 pickle.dump(model, f)
