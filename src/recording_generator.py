@@ -17,6 +17,7 @@ class RecordingGenerator():
                  inter_spike_train_interval_lambda_ms = 1, # Exponential
                  CAP_jitter_mean_std_ms = [1, 0.1], # Gaussian
                  template_jitter_ms = 0.01, # Uniform (width)
+                 spontaneous_firing_rate_Hz = 1000, # Poisson
                  SA_templates = None,
                  AP_templates = None,
                  ME_template  = None
@@ -31,6 +32,7 @@ class RecordingGenerator():
         self.inter_spike_train_interval_lambda_ms = inter_spike_train_interval_lambda_ms
         self.CAP_jitter_mean_std_ms = CAP_jitter_mean_std_ms
         self.template_jitter_ms = template_jitter_ms
+        self.spontaneous_firing_rate_Hz = spontaneous_firing_rate_Hz
 
         self.fs = 30_000 # 30 kHz
 
@@ -60,6 +62,7 @@ class RecordingGenerator():
         time_new_ms = np.linspace(self.template_jitter_ms/2+random_jitter, 
                                   template_length_ms-self.template_jitter_ms/2 + random_jitter, 
                                   num_points)
+        
         interp_func = interp1d(time_old_ms, template, kind='cubic')
         try:
             interp_template = interp_func(time_new_ms)
@@ -105,6 +108,11 @@ class RecordingGenerator():
 
             SAs.append(SA)
             SA_indexes.append(idxs)
+
+            res = self.add_spontaneous_spikes(data[start_SA: start_SA+self.SA_length], firing_Hz=self.spontaneous_firing_rate_Hz, return_APs=True)
+            APs += res[0]
+            AP_indexes += res[1]
+            data[start_SA: start_SA+self.SA_length] = res[2]
 
             num_cells = np.random.poisson(self.num_cells)
             for cell_idx in range(num_cells):
@@ -201,19 +209,17 @@ if __name__ == "__main__":
         inter_spike_train_interval_lambda_ms = 5,
         CAP_jitter_mean_std_ms = [1, 0.1],
         template_jitter_ms = 1, 
+        spontaneous_firing_rate_Hz=1000
         )
     
-    SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(1000, verbose=0)
+    SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(2, verbose=0)
     noised_data = rec.add_white_noise(data, SNR_dB=10)
     noised_data = rec.add_mains_electricity_noise(noised_data, SNR_dB=10)
-    noised_data = rec.add_spontaneous_spikes(noised_data, firing_Hz=1)
 
     plt.plot(noised_data, label='noised_data')
     plt.plot(data, label='data', color='orange')
     plt.legend()
     plt.show()
-
-    quit()
 
     plt.scatter(np.arange(len(data)), data, color=['olive' if x else 'pink' for x in is_spike], s=3)
     plt.title('Data without noise, spiked index marked green')
