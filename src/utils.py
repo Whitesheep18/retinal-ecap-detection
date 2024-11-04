@@ -31,7 +31,7 @@ def get_signal_by_type(path_to_data='../data', eye=1, design='3D', experiment='T
         print(f"Reading {file}")
     return get_signal(filepath=f'{path}/{file}', verbose=verbose)
 
-def get_template(template_type, path_to_templates = '../simulate'):
+def get_template(template_type, path_to_templates = '../retinal-ecap-detection/simulate'):
     if template_type == 'SA':
         return np.load(f"{path_to_templates}/SA_templates.npy")
     elif template_type == 'ME':
