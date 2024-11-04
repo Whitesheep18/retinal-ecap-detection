@@ -1,14 +1,13 @@
 import numpy as np
 from src.recording_generator import RecordingGenerator
 
-def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size = 2700, white_SNR_dB=20, mains_SNR_dB=20, spontaneous_firing_Hz=1000):
+def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size = 2700, white_SNR_dB=20, ME_amplitude_scaler=1, spontaneous_firing_Hz=1000):
     """
     rec: RecordingGenerator 
     """
     SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(num_stim, verbose=0)
     noised_data = rec.add_white_noise(data, SNR_dB=white_SNR_dB)
-    noised_data = rec.add_mains_electricity_noise(noised_data, SNR_dB=mains_SNR_dB)
-    noised_data = rec.add_spontaneous_spikes(noised_data, firing_Hz=spontaneous_firing_Hz)
+    noised_data = rec.add_mains_electricity_noise(noised_data, amplitude_scaler=ME_amplitude_scaler)
 
     SA_ends = [idx[-1] for idx in SA_indexes]
 
@@ -39,7 +38,7 @@ def make_dataset_stim(
     template_jitter_ms=1,
     window_size=2700,
     white_SNR_dB_list=[20],
-    mains_SNR_dB_list=[20],
+    ME_amplitude_scaler_list=[1],
     spontaneous_firing_Hz_list=[100]):
 
     n_cells_spike = n
@@ -48,7 +47,7 @@ def make_dataset_stim(
 
     for num_cells in num_cells_list:
         for white_SNR_dB in white_SNR_dB_list:
-            for mains_SNR_dB in mains_SNR_dB_list:
+            for ME_amplitude_scaler in ME_amplitude_scaler_list:
                 for spontaneous_firing_Hz in spontaneous_firing_Hz_list:
                     for AP_std_pct in AP_amplitude_std_pct_list:
                         AP_amplitude_mean_std_pct = [1, AP_std_pct]
@@ -71,7 +70,7 @@ def make_dataset_stim(
                         X_cells, y_reg_cells = get_noised_recording_stim(
                             rec_cells, num_stim=n_cells_spike, num_samples=n_cells_spike,
                             window_size=window_size, white_SNR_dB=white_SNR_dB,
-                            mains_SNR_dB=mains_SNR_dB, spontaneous_firing_Hz=spontaneous_firing_Hz
+                            ME_amplitude_scaler=ME_amplitude_scaler, spontaneous_firing_Hz=spontaneous_firing_Hz
                         )
 
                         # Collect samples for each amplitude level in lists
@@ -84,6 +83,6 @@ def make_dataset_stim(
 
     return X, y_reg
 
-# X, y_reg = make_dataset_stim(num_cells_list=[0, 50],white_SNR_dB_list=[10,20,50],   
-#                              mains_SNR_dB_list=[10,20,50], spontaneous_firing_Hz_list=[100,1000],   
-#                              AP_amplitude_std_pct_list=[1, 10, 20])
+X, y_reg = make_dataset_stim(num_cells_list=[0, 50],white_SNR_dB_list=[10,20,50],   
+                             ME_amplitude_scaler_list=[1, 2], spontaneous_firing_Hz_list=[100,1000],   
+                             AP_amplitude_std_pct_list=[1, 10, 20])

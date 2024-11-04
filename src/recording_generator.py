@@ -55,26 +55,17 @@ class RecordingGenerator():
             return template        
 
     def interp_template(self, template, template_length_ms):
+
         time_old_ms = np.linspace(0, template_length_ms, len(template))
         
         num_points = int(self.fs*template_length_ms//1000)
         random_jitter = np.random.uniform(-self.template_jitter_ms/2, self.template_jitter_ms/2)
         time_new_ms = np.linspace(self.template_jitter_ms/2+random_jitter, 
-                                  template_length_ms-self.template_jitter_ms/2 + random_jitter, 
-                                  num_points)
-        
+                                template_length_ms-self.template_jitter_ms/2 + random_jitter, 
+                                num_points)
+
         interp_func = interp1d(time_old_ms, template, kind='cubic')
-        try:
-            interp_template = interp_func(time_new_ms)
-        except Exception as e:
-            print(template_length_ms)
-            print(self.template_jitter_ms)
-            print(random_jitter)
-            print(time_old_ms)
-            print(time_new_ms)
-            time_new_no_jitter = np.linspace(0, template_length_ms, num_points)
-            interp_template = interp_func(time_new_no_jitter)
-        
+        interp_template = interp_func(time_new_ms)
         return interp_template, time_new_ms
     
     def generate(self, num_stimuli=1,verbose=0):
@@ -157,21 +148,18 @@ class RecordingGenerator():
         noise = np.random.normal(0, np.sqrt(noise_power), len(data))
         return data + noise
     
-    def add_mains_electricity_noise(self, data, ME_template=None, SNR_dB=10):
+    def add_mains_electricity_noise(self, data, ME_template=None, amplitude_scaler=1):
         """
         Adds mains electricity noise to the data
         """
-        # TODO: interpolate ME_template
+
         if ME_template is None:
             ME_template = self.ME_template
         ME = np.tile(ME_template.flatten(), len(data)//len(ME_template) + 1)
+        ME = np.roll(ME, np.random.randint(len(ME))) # random phase
         ME = ME[:len(data)]
-        # amplify to match SNR
-        ME_power = np.mean(ME**2)
-        data_power = np.mean(data**2)
-        ME *= np.sqrt(data_power / ME_power / 10**(SNR_dB/10))
-        # random phase
-        ME = np.roll(ME, np.random.randint(len(ME)))
+        ME *= amplitude_scaler
+        ME, _ = self.interp_template(ME, len(ME)/self.fs*1000) # jitter
         
         return data + ME
     
@@ -184,6 +172,7 @@ class RecordingGenerator():
         for _ in range(num_spikes):
             AP_template = self.AP_templates[np.random.choice(len(self.AP_templates)), :]
             AP_template_length_ms = np.random.normal(*self.AP_length_mean_std_ms)
+            AP_template_length_ms = np.max([AP_template_length_ms, self.template_jitter_ms*2])
             AP, _ = self.interp_template(AP_template, AP_template_length_ms)
             AP_amplitude = np.random.normal(*self.AP_amplitude_mean_std_pct)
             AP *= AP_amplitude
