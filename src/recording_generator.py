@@ -203,7 +203,7 @@ if __name__ == "__main__":
     
     SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(2, verbose=0)
     noised_data = rec.add_white_noise(data, SNR_dB=10)
-    noised_data = rec.add_mains_electricity_noise(noised_data, SNR_dB=10)
+    noised_data = rec.add_mains_electricity_noise(noised_data, amplitude_scaler=1)
 
     plt.plot(noised_data, label='noised_data')
     plt.plot(data, label='data', color='orange')
@@ -262,7 +262,7 @@ if __name__ == "__main__":
 
     np.save('X.npy', X)
     np.save('y_class.npy', y_class)
-    np.save('x_reg.npy', y_reg)
+    np.save('y_reg.npy', y_reg)
     
     plt.plot(y_reg)
     plt.xlabel('Window id')
