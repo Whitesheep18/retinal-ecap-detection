@@ -1,7 +1,7 @@
 #!/bin/bash
 #BSUB -J dataset[1-3]
 #BSUB -q hpc
-#BSUB -W 10
+#BSUB -W 4:00
 #BSUB -n 1
 #BSUB -R "span[hosts=1]"
 #BSUB -R "select[model==XeonGold6226R]" 
@@ -12,8 +12,8 @@
 # Initialize Python environment
 source ../irishcream/bin/activate
 
-python spike_detection/train.py --models LinearRegression --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv
+python spike_detection/train.py --models FreshPRINCE --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models
 # multiple models: python spike_detection/train.py --models LinearRegression FreshPRINCE InceptionNet --dataset_idx $LSB_JOBINDEX
 
 
-# run with: bsub < spike_detection/all_dataset_job_array.sh
+# run with: bsub < spike_detection/all_dataset_train_job_array.sh
