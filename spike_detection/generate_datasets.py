@@ -24,7 +24,16 @@ params = {
     "white_SNR_dB_list": [snr_value], # len is no datasets
     "ME_amplitude_scaler_list": [10],
     "spontaneous_firing_Hz_list": [100],
-    "AP_amplitude_std_pct_list": [1, 10, 20]
+    "AP_amplitude_std_pct_list": [1, 10, 20],
+    "first_AP_stim_lambda_ms": 0.2,
+    "AP_length_mean_std_ms": [5, 1],
+    "SA_amplitude_mean_std_pct": [1, 0.1],
+    "spike_train_start_lambda_ms": 1,
+    "spike_train_rate_lambda": 3,
+    "inter_spike_train_interval_lambda_ms": 5,
+    "CAP_jitter_mean_std_ms": [1, 0.1],
+    "template_jitter_ms": 1,
+    "window_size": 2700,
 }
 
 # Save parameters to a JSON file
