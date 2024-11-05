@@ -1,7 +1,7 @@
 import numpy as np
 from src.recording_generator import RecordingGenerator
 
-def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size = 2700, white_SNR_dB=20, ME_amplitude_scaler=1, spontaneous_firing_Hz=1000):
+def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size = 2700, white_SNR_dB=20, ME_amplitude_scaler=1):
     """
     rec: RecordingGenerator 
     """
@@ -63,14 +63,15 @@ def make_dataset_stim(
                             spike_train_rate_lambda=spike_train_rate_lambda,
                             inter_spike_train_interval_lambda_ms=inter_spike_train_interval_lambda_ms,
                             CAP_jitter_mean_std_ms=CAP_jitter_mean_std_ms,
-                            template_jitter_ms=template_jitter_ms
+                            template_jitter_ms=template_jitter_ms,
+                            spontaneous_firing_rate_Hz=spontaneous_firing_Hz
                         )
                         
                         # Generate data samples with spikes and without spikes
                         X_cells, y_reg_cells = get_noised_recording_stim(
                             rec_cells, num_stim=n_cells_spike, num_samples=n_cells_spike,
                             window_size=window_size, white_SNR_dB=white_SNR_dB,
-                            ME_amplitude_scaler=ME_amplitude_scaler, spontaneous_firing_Hz=spontaneous_firing_Hz
+                            ME_amplitude_scaler=ME_amplitude_scaler
                         )
 
                         # Collect samples for each amplitude level in lists
@@ -81,8 +82,11 @@ def make_dataset_stim(
     X = np.concatenate(X_list, axis=0)
     y_reg = np.concatenate(y_reg_list, axis=0)
 
+    print("shape X generation", X.shape)
+
     return X, y_reg
 
-X, y_reg = make_dataset_stim(num_cells_list=[0, 50],white_SNR_dB_list=[10,20,50],   
-                             ME_amplitude_scaler_list=[1, 2], spontaneous_firing_Hz_list=[100,1000],   
+if __name__ == "__main__":
+    X, y_reg = make_dataset_stim(num_cells_list=[0, 50],white_SNR_dB_list=[10,20,50],   
+                                ME_amplitude_scaler_list=[1, 2], spontaneous_firing_Hz_list=[100,1000],   
                              AP_amplitude_std_pct_list=[1, 10, 20])
