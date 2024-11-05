@@ -1,6 +1,7 @@
 pandas
 aeon
 tsfresh
+tensorflow
 sktime
 matplotlib
 bokeh
