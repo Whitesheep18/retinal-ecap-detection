@@ -43,8 +43,11 @@ if __name__ == "__main__":
             from aeon.regression.feature_based import FreshPRINCERegressor
             model = FreshPRINCERegressor(verbose=args.verbose)
         elif model == "InceptionNet":
-            from aeon.regression.feature_based import InceptionTimeRegressor
-            model = InceptionTimeRegressor(verbose=args.verbose)
+            from aeon.regression.deep_learning import InceptionTimeRegressor
+            if args.save_model_path:
+                model = InceptionTimeRegressor(verbose=args.verbose, file_path = args.save_model_path, save_best_model = True)
+            else:
+                model = InceptionTimeRegressor(verbose=args.verbose)
         else:
             print(f"Unknown model {model}")
             sys.exit(1)

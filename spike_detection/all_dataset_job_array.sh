@@ -6,8 +6,8 @@
 #BSUB -R "span[hosts=1]"
 #BSUB -R "select[model==XeonGold6226R]" 
 #BSUB -R "rusage[mem=2GB]"
-#BSUB -o dataset_%J.out
-#BSUB -e dataset_%J.err
+#BSUB -o outs/dataset_%J.out
+#BSUB -e outs/dataset_%J.err
 
 # Initialize Python environment
 source ../irishcream/bin/activate
