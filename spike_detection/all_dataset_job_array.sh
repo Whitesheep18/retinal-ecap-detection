@@ -8,6 +8,7 @@
 #BSUB -R "rusage[mem=2GB]"
 #BSUB -o outs/dataset_%J.out
 #BSUB -e outs/dataset_%J.err
+#BSUB -Ne
 
 # Initialize Python environment
 source ../irishcream/bin/activate

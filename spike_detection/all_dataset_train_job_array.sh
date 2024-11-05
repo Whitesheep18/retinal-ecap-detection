@@ -8,6 +8,7 @@
 #BSUB -R "rusage[mem=2GB]"
 #BSUB -o outs/train_%J.out
 #BSUB -e outs/train_%J.err
+#BSUB -Ne
 
 # Initialize Python environment
 source ../irishcream/bin/activate
