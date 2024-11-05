@@ -1,7 +1,7 @@
 #!/bin/bash
-#BSUB -J dataset[1-3]
+#BSUB -J generate_ds[1-3]
 #BSUB -q hpc
-#BSUB -W 10
+#BSUB -W 4:00
 #BSUB -n 1
 #BSUB -R "span[hosts=1]"
 #BSUB -R "select[model==XeonGold6226R]" 

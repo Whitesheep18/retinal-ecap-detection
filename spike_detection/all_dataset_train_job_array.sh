@@ -1,5 +1,5 @@
 #!/bin/bash
-#BSUB -J dataset[1-3]
+#BSUB -J train_DS[1-3]
 #BSUB -q hpc
 #BSUB -W 4:00
 #BSUB -n 1
@@ -12,7 +12,7 @@
 # Initialize Python environment
 source ../irishcream/bin/activate
 
-python spike_detection/train.py --models FreshPRINCE --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models
+python spike_detection/train.py --models InceptionNet --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models
 # multiple models: python spike_detection/train.py --models LinearRegression FreshPRINCE InceptionNet --dataset_idx $LSB_JOBINDEX
 
 
