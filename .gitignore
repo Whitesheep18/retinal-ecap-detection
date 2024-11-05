@@ -1,6 +1,8 @@
 # Extras
 data/*
 simulated_data/*
+models/*
+outs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
