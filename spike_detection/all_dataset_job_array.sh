@@ -1,13 +1,14 @@
 #!/bin/bash
-#BSUB -J dataset[1-3]
+#BSUB -J gen[1-5]
 #BSUB -q hpc
-#BSUB -W 10
+#BSUB -W 4:00
 #BSUB -n 1
 #BSUB -R "span[hosts=1]"
 #BSUB -R "select[model==XeonGold6226R]" 
 #BSUB -R "rusage[mem=2GB]"
 #BSUB -o outs/dataset_%J.out
 #BSUB -e outs/dataset_%J.err
+#BSUB -Ne
 
 # Initialize Python environment
 source ../irishcream/bin/activate

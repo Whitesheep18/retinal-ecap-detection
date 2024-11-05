@@ -6,7 +6,8 @@ from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.model_selection import train_test_split
 
 def train_and_eval(model, dataset, results, save_model_path, verbose=0):
-    print(verbose)
+
+    model_name = model.__class__.__name__
 
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
@@ -23,11 +24,11 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0):
 
     if verbose: print(f"MSE: {mse}, R2: {r2}")
     with open(results, "a") as f:
-        f.write(f"{dt.datetime.now()},{model},{mse},{r2},{dataset.split('/')[-1]}\n")
+        f.write(f"{dt.datetime.now()},{model_name},{mse},{r2},{dataset.split('/')[-1]}\n")
     
     
-    if save_model_path != "False" and model != "InceptionNet":
-        model_path = os.path.join(save_model_path, f"{model}_{os.path.basename(dataset)}.pkl")
+    if save_model_path != "False" and model_name != "InceptionTimeRegressor":
+        model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}.pkl")
         print('Saving model to', model_path)
         with open(model_path, "wb") as f:
             pickle.dump(model, f)
