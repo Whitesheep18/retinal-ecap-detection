@@ -9,6 +9,7 @@ if __name__ == "__main__":
     import glob
     import sys
     import pickle
+    import aeon
     import datetime as dt
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import root_mean_squared_error, r2_score
@@ -23,8 +24,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.dataset_idx is not None:
-        datasets = os.listdir('simulated_data')
-        dataset_path = os.path.join('simulated_data', datasets[args.dataset_idx])
+        datasets = [x for x in os.listdir('simulated_data') if x.startswith('DS')]
+        dataset_path = os.path.join('simulated_data', datasets[args.dataset_idx-1])
     elif args.dataset is not None:
         dataset_path = os.path.join('simulated_data', args.dataset)
     else:

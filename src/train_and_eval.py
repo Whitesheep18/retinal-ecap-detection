@@ -22,7 +22,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0):
 
     if verbose: print(f"MSE: {mse}, R2: {r2}")
     with open(results, "a") as f:
-        f.write(f"{dt.datetime.now()},{model},{mse},{r2}\n")
+        f.write(f"{dt.datetime.now()},{model},{mse},{r2},{dataset.split('/')[-1]}\n")
     
     if save_model_path != "False":
         model_path = os.path.join(save_model_path, f"{model}_{os.path.basename(dataset)}.pkl")

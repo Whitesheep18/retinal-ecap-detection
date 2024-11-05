@@ -13,7 +13,7 @@ spontaneous_firing_Hz_value = 100
 folder_name = f"DS-{snr_value}-{ME_value}-{spontaneous_firing_Hz_value}"
 
 # Define the base directory for saving data
-base_directory = 'data_simulated'
+base_directory = 'simulated_data'
 folder_path = os.path.join(base_directory, folder_name)
 os.makedirs(folder_path, exist_ok=True)
 
@@ -21,7 +21,7 @@ os.makedirs(folder_path, exist_ok=True)
 params = {
     "num_cells_list": [0, 50],
     "white_SNR_dB_list": [snr_value],
-    "mains_SNR_dB_list": [10],
+    "ME_amplitude_scaler_list": [10],
     "spontaneous_firing_Hz_list": [100],
     "AP_amplitude_std_pct_list": [1, 10, 20]
 }
