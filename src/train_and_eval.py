@@ -25,7 +25,8 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0):
     with open(results, "a") as f:
         f.write(f"{dt.datetime.now()},{model},{mse},{r2},{dataset.split('/')[-1]}\n")
     
-    if save_model_path != "False":
+    
+    if save_model_path != "False" and model != "InceptionNet":
         model_path = os.path.join(save_model_path, f"{model}_{os.path.basename(dataset)}.pkl")
         print('Saving model to', model_path)
         with open(model_path, "wb") as f:
