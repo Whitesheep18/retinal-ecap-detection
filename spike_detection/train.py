@@ -24,8 +24,6 @@ if __name__ == "__main__":
     parser.add_argument('--verbose', type=int, default=1, help="print what's going on")
     args = parser.parse_args()
 
-    print(args.verbose)
-
     if args.dataset_idx is not None:
         datasets = [x for x in os.listdir('simulated_data') if x.startswith('DS')]
         dataset_path = os.path.join('simulated_data', datasets[args.dataset_idx-1])
@@ -44,10 +42,11 @@ if __name__ == "__main__":
             model = FreshPRINCERegressor(verbose=args.verbose)
         elif model == "InceptionNet":
             from aeon.regression.deep_learning import InceptionTimeRegressor
-            if args.save_model_path:
-                model = InceptionTimeRegressor(verbose=args.verbose, file_path = args.save_model_path, save_best_model = True)
+            if args.save_model_path != 'False':
+                model_path = os.path.join(args.save_model_path, f"{model}_{os.path.basename(dataset_path)}.pkl")
+                model = InceptionTimeRegressor(verbose=args.verbose, file_path = model_path, save_best_model = True)
             else:
-                model = InceptionTimeRegressor(verbose=args.verbose)
+                model = InceptionTimeRegressor(verbose=args.verbose, )
         else:
             print(f"Unknown model {model}")
             sys.exit(1)
