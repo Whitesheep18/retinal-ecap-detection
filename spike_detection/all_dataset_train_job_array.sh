@@ -1,5 +1,5 @@
 #!/bin/bash
-#BSUB -J train_DS[1-3]
+#BSUB -J train[1-3]
 #BSUB -q hpc
 #BSUB -W 4:00
 #BSUB -n 1
