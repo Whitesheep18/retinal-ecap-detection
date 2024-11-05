@@ -6,6 +6,7 @@ from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.model_selection import train_test_split
 
 def train_and_eval(model, dataset, results, save_model_path, verbose=0):
+    print(verbose)
 
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))

@@ -21,7 +21,10 @@ if __name__ == "__main__":
     parser.add_argument('--save_model_path', type=str, default='False', help='wether to save the model as pickle [<path_to_model>/False]')
     parser.add_argument('--dataset', type=str, help='path to dataset folder')
     parser.add_argument('--dataset_idx', type=int, help='index of the dataset in the folder')
+    parser.add_argument('--verbose', type=int, default=1, help="print what's going on")
     args = parser.parse_args()
+
+    print(args.verbose)
 
     if args.dataset_idx is not None:
         datasets = [x for x in os.listdir('simulated_data') if x.startswith('DS')]
@@ -36,15 +39,15 @@ if __name__ == "__main__":
         if model == "LinearRegression":
             from sklearn.linear_model import LinearRegression
             model = LinearRegression()
-        elif model == "FreshPINCE":        
+        elif model == "FreshPRINCE":        
             from aeon.regression.feature_based import FreshPRINCERegressor
-            model = FreshPRINCERegressor()
+            model = FreshPRINCERegressor(verbose=args.verbose)
         elif model == "InceptionNet":
             from aeon.regression.feature_based import InceptionTimeRegressor
-            model = InceptionTimeRegressor()
+            model = InceptionTimeRegressor(verbose=args.verbose)
         else:
             print(f"Unknown model {model}")
             sys.exit(1)
 
-        train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=1)
+        train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose)
 
