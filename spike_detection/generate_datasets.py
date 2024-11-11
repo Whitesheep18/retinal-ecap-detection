@@ -18,13 +18,20 @@ folder_path = os.path.join(base_directory, folder_name)
 os.makedirs(folder_path, exist_ok=True)
 
 # Define the parameters
+N = 2000 # total dataset size
+num_cells_list = [0, 50]
+ME_amplitude_scaler_list = [10]
+spontaneous_firing_Hz_list = [100]
+AP_amplitude_std_pct_list = [1, 10, 20]
+num_comb = len(num_cells_list) + len(ME_amplitude_scaler_list) + len(spontaneous_firing_Hz_list) + len(AP_amplitude_std_pct_list)
+
 params = {
-    "n": 1666,
-    "num_cells_list": [0, 50],
+    "n": N//(num_comb), # num samples per combination
+    "num_cells_list": num_cells_list,
     "white_SNR_dB_list": [snr_value], # len is no datasets
-    "ME_amplitude_scaler_list": [10],
-    "spontaneous_firing_Hz_list": [100],
-    "AP_amplitude_std_pct_list": [1, 10, 20],
+    "ME_amplitude_scaler_list": ME_amplitude_scaler_list,
+    "spontaneous_firing_Hz_list": spontaneous_firing_Hz_list,
+    "AP_amplitude_std_pct_list": AP_amplitude_std_pct_list,
     "first_AP_stim_lambda_ms": 0.2,
     "AP_length_mean_std_ms": [5, 1],
     "SA_amplitude_mean_std_pct": [1, 0.1],

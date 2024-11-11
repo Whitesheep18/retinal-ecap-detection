@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.model_selection import train_test_split
 
-def train_and_eval(model, dataset, results, save_model_path, verbose=0):
+def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=''):
 
     model_name = model.__class__.__name__
 
@@ -19,12 +19,12 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0):
     y_pred = model.predict(X_test)
 
     if verbose: print("Evaluating model")
-    mse = root_mean_squared_error(y_test, y_pred)
+    rmse = root_mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
-    if verbose: print(f"MSE: {mse}, R2: {r2}")
+    if verbose: print(f"RMSE: {rmse}, R2: {r2}")
     with open(results, "a") as f:
-        f.write(f"{dt.datetime.now()},{model_name},{mse},{r2},{dataset.split('/')[-1]}\n")
+        f.write(f"{dt.datetime.now()},{model_name},{rmse},{r2},{dataset.split('/')[-1]},{comment}\n")
     
     
     if save_model_path != "False" and model_name != "InceptionTimeRegressor":
