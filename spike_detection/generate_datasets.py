@@ -23,10 +23,13 @@ num_cells_list = [0, 50]
 ME_amplitude_scaler_list = [10]
 spontaneous_firing_Hz_list = [10]
 AP_amplitude_std_pct_list = [1, 10]
-num_comb = len(num_cells_list) + len(ME_amplitude_scaler_list) + len(spontaneous_firing_Hz_list) + len(AP_amplitude_std_pct_list)
+num_comb = len(num_cells_list) * len(ME_amplitude_scaler_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
+num_samples_per_comb = N//(num_comb)
+
+print(f'Generating {num_samples_per_comb} samples per comb, ie. {num_samples_per_comb*num_comb} samples in total - close to {N}')
 
 params = {
-    "n": N//(num_comb), # num samples per combination
+    "n": num_samples_per_comb,
     "num_cells_list": num_cells_list,
     "white_SNR_dB_list": [snr_value], # len is no datasets
     "ME_amplitude_scaler_list": ME_amplitude_scaler_list,

@@ -1,5 +1,5 @@
 #!/bin/bash
-#BSUB -J train[1-5]
+#BSUB -J train[1-6]
 #BSUB -q gpuv100
 #BSUB -W 10:00
 #BSUB -n 5
