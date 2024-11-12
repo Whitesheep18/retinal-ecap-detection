@@ -41,6 +41,9 @@ if __name__ == "__main__":
         elif model == "FreshPRINCE":        
             from aeon.regression.feature_based import FreshPRINCERegressor
             model = FreshPRINCERegressor(verbose=args.verbose, default_fc_parameters='efficient', n_estimators=100)
+        elif model == "DrCIF":        
+            from aeon.regression.interval_based import DrCIFRegressor
+            model = DrCIFRegressor(n_estimators=10, min_interval_length= 100, random_state=0)
         elif model == "InceptionNet":
             from aeon.regression.deep_learning import InceptionTimeRegressor
             n_epochs =300
