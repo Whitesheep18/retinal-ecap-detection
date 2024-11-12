@@ -23,9 +23,14 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     r2 = r2_score(y_test, y_pred)
 
     if verbose: print(f"RMSE: {rmse}, R2: {r2}")
-    with open(results, "a") as f:
-        f.write(f"{dt.datetime.now()},{model_name},{rmse},{r2},{dataset.split('/')[-1]},{comment}\n")
-    
+    if os.path.exists(results):
+        with open(results, "a") as f:
+            f.write(f"{dt.datetime.now()},{model_name},{rmse},{r2},{dataset.split('/')[-1]},{comment}\n")
+    else:
+        with open(results, "w") as f:
+            f.write("Date,Model,RMSE,R2,Dataset,comment\n")
+            f.write(f"{dt.datetime.now()},{model_name},{rmse},{r2},{dataset.split('/')[-1]},{comment}\n")
+
     
     if save_model_path != "False" and model_name != "InceptionTimeRegressor":
         model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}.pkl")
