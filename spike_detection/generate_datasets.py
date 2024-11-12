@@ -6,7 +6,7 @@ import sys
 
 idx = int(sys.argv[1])
 
-snr_range = [-10,0,10,20,50]
+snr_range = [-10,0,10,20,50,80]
 snr_value = snr_range[idx-1]
 ME_value = 10
 spontaneous_firing_Hz_value = 100
@@ -21,12 +21,15 @@ os.makedirs(folder_path, exist_ok=True)
 N = 2000 # total dataset size
 num_cells_list = [0, 50]
 ME_amplitude_scaler_list = [10]
-spontaneous_firing_Hz_list = [100]
-AP_amplitude_std_pct_list = [1, 10, 20]
-num_comb = len(num_cells_list) + len(ME_amplitude_scaler_list) + len(spontaneous_firing_Hz_list) + len(AP_amplitude_std_pct_list)
+spontaneous_firing_Hz_list = [10]
+AP_amplitude_std_pct_list = [1, 10]
+num_comb = len(num_cells_list) * len(ME_amplitude_scaler_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
+num_samples_per_comb = N//(num_comb)
+
+print(f'Generating {num_samples_per_comb} samples per comb, ie. {num_samples_per_comb*num_comb} samples in total - close to {N}')
 
 params = {
-    "n": N//(num_comb), # num samples per combination
+    "n": num_samples_per_comb,
     "num_cells_list": num_cells_list,
     "white_SNR_dB_list": [snr_value], # len is no datasets
     "ME_amplitude_scaler_list": ME_amplitude_scaler_list,
@@ -36,7 +39,7 @@ params = {
     "AP_length_mean_std_ms": [5, 1],
     "SA_amplitude_mean_std_pct": [1, 0.1],
     "spike_train_start_lambda_ms": 1,
-    "spike_train_rate_lambda": 3,
+    "spike_train_rate_lambda": 1,
     "inter_spike_train_interval_lambda_ms": 5,
     "CAP_jitter_mean_std_ms": [1, 0.1],
     "template_jitter_ms": 1,

@@ -1,5 +1,5 @@
 #!/bin/bash
-#BSUB -J gen[1-5]
+#BSUB -J gen[1-6]
 #BSUB -q hpc
 #BSUB -W 4:00
 #BSUB -n 1
