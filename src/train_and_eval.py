@@ -32,9 +32,14 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             f.write(f"{dt.datetime.now()},{model_name},{rmse},{r2},{dataset.split('/')[-1]},{comment}\n")
 
     
-    if save_model_path != "False" and model_name != "InceptionTimeRegressor":
-        model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}.pkl")
-        print('Saving model to', model_path)
-        with open(model_path, "wb") as f:
-            pickle.dump(model, f)
+    if save_model_path != "False":
+        if 'inception' not in model_name.lower():
+            model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}.pkl")
+            print('Saving model to', model_path)
+            with open(model_path, "wb") as f:
+                pickle.dump(model, f)
+        elif model_name == 'InceptionTime':
+            model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}")
+            model.save(model_path)
+
     
