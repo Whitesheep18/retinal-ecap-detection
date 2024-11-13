@@ -9,7 +9,7 @@ idx = int(sys.argv[1])
 snr_range = [-10,0,10,20,50,80]
 snr_value = snr_range[idx-1]
 ME_value = 10
-spontaneous_firing_Hz_value = 100
+spontaneous_firing_Hz_value = 10
 folder_name = f"DS_{snr_value}_{ME_value}_{spontaneous_firing_Hz_value}"
 
 # Define the base directory for saving data
@@ -20,8 +20,8 @@ os.makedirs(folder_path, exist_ok=True)
 # Define the parameters
 N = 2000 # total dataset size
 num_cells_list = [0, 50]
-ME_amplitude_scaler_list = [10]
-spontaneous_firing_Hz_list = [10]
+ME_amplitude_scaler_list = [ME_value]
+spontaneous_firing_Hz_list = [spontaneous_firing_Hz_value]
 AP_amplitude_std_pct_list = [1, 10]
 num_comb = len(num_cells_list) * len(ME_amplitude_scaler_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
 num_samples_per_comb = N//(num_comb)
