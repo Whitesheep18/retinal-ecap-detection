@@ -107,11 +107,10 @@ class Lambda(torch.nn.Module):
 
 
 class InceptionModel(torch.nn.Module):
-    def __init__(self, input_size, num_classes, filters, depth):
+    def __init__(self, input_size, filters, depth):
         super(InceptionModel, self).__init__()
 
         self.input_size = input_size
-        self.num_classes = num_classes
         self.filters = filters
         self.depth = depth
         
@@ -129,7 +128,7 @@ class InceptionModel(torch.nn.Module):
                 )
         
         modules['avg_pool'] = Lambda(f=lambda x: torch.mean(x, dim=-1))
-        modules['linear'] = torch.nn.Linear(in_features=4 * filters, out_features=num_classes)
+        modules['linear'] = torch.nn.Linear(in_features=4 * filters, out_features=1)
         
         self.model = torch.nn.Sequential(modules)
 
@@ -141,4 +140,5 @@ class InceptionModel(torch.nn.Module):
                 x = y
         y = self.model.get_submodule('avg_pool')(y)
         y = self.model.get_submodule('linear')(y)
+        #torch.nn.functional.relu(y)? # counts are never negative. maybe log-exp space is better? maybe it should be handled in the loss function
         return y
