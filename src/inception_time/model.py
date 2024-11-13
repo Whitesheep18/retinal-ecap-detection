@@ -157,7 +157,7 @@ class InceptionTime():
                     running_loss += loss.item()
 
                     # Report
-                    if step % 5 ==0 and self.verbose:
+                    if step % 10 ==0 and self.verbose:
                         loss = loss.detach().cpu()
                         pbar.set_description(f"epoch={epoch+1}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}")
 
@@ -297,7 +297,7 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 2, epochs=3)
+    model = InceptionTime(n_models = 2, epochs=100)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred = model.predict(X_test)
