@@ -75,6 +75,8 @@ class InceptionTime():
     def fit(self,
             x, 
             y,
+            x_val,
+            y_val,
             train_from_scratch=True):
         
         '''
@@ -94,24 +96,37 @@ class InceptionTime():
         '''
         # Add channels dimention
         x = x[:, np.newaxis, :]
+        x_val = x_val[:, np.newaxis, :]
+
 
         if train_from_scratch:
-            self._set_scalers(x)
+            self._set_scalers(x) 
             self._build_models()
 
         # Scale the data
         x = (x - self.mu) / self.sigma
+        x_val = (x_val - self.mu) / self.sigma
 
         # Save the data.
         self.x = torch.from_numpy(x).float().to(self.device)
         self.y = torch.from_numpy(y).long().to(self.device)
+        self.x_val = torch.from_numpy(x_val).float().to(self.device)
+        self.y_val = torch.from_numpy(y_val).long().to(self.device)
+
 
         # Generate the training dataset.
-        dataset = torch.utils.data.DataLoader(
+        train_dataset = torch.utils.data.DataLoader(
             dataset=torch.utils.data.TensorDataset(self.x, self.y),
             batch_size=self.batch_size,
             shuffle=True
         )
+        
+        val_dataset = torch.utils.data.DataLoader(
+            dataset=torch.utils.data.TensorDataset(self.x_val, self.y_val),
+            batch_size=self.batch_size,
+            shuffle=False
+        )
+    
 
         
         for m in range(len(self.models)):
@@ -126,13 +141,13 @@ class InceptionTime():
             print(f'Training model {m + 1} on {self.device}.')
             self.models[m].train(True)
 
-            num_steps = len(dataset)*self.epochs
+            num_steps = len(train_dataset)*self.epochs
             epoch = 0
             with tqdm(range(num_steps)) as pbar:
                 running_loss = 0.0
                 epoch_loss = 0.0
                 for step in pbar:
-                    features, target = next(iter(dataset))
+                    features, target = next(iter(train_dataset))
                     optimizer.zero_grad()
                     output = self.models[m](features.to(self.device))
                     output = output.flatten()
@@ -144,12 +159,24 @@ class InceptionTime():
                     # Report
                     if step % 5 ==0 and self.verbose:
                         loss = loss.detach().cpu()
-                        pbar.set_description(f"epoch={epoch}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}")
+                        pbar.set_description(f"epoch={epoch+1}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}")
 
-                    if (step+1) % len(dataset) == 0:
-                        epoch += 1
-                        epoch_loss = running_loss/len(dataset)
+                    if (step+1) % len(train_dataset) == 0:
+                        epoch_loss = running_loss/len(train_dataset)
                         running_loss = 0.0
+                        print(f"Epoch {epoch+1}, Training Loss: {epoch_loss:.4f}")
+                        # Validation
+                        self.models[m].eval()
+                        val_loss = 0.0
+                        with torch.no_grad():
+                            for X_val, y_val in val_dataset:
+                                val_output = self.models[m](X_val.to(self.device)).flatten()
+                                val_loss += loss_fn(val_output, y_val.float().to(self.device)).item()
+                        self.models[m].train(True)
+                        avg_val_loss = val_loss / len(val_dataset)
+                        print(f"Epoch {epoch+1}, Validation Loss: {avg_val_loss:.4f}")
+                        epoch += 1
+                        
 
             self.models[m].train(False)
 
@@ -263,20 +290,21 @@ if __name__ == '__main__':
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import root_mean_squared_error
 
-    dataset = '../../simulated_data/DS_80_10_100'
+    dataset = 'simulated_data/DS_80_10_100'
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
     model = InceptionTime(n_models = 2, epochs=3)
-    model.fit(X_train, y_train)
+    model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred = model.predict(X_test)
     print(root_mean_squared_error(y_test, y_pred))
 
-    model.save('../../models/InceptionTime_DS_80_10_100')
+    # model.save('../../models/InceptionTime_DS_80_10_100')
 
-    model2 = InceptionTime()
-    model2.load('../../models/InceptionTime_DS_80_10_100')
+    # model2 = InceptionTime()
+    # model2.load('../../models/InceptionTime_DS_80_10_100')
     
