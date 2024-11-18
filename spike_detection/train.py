@@ -51,10 +51,9 @@ if __name__ == "__main__":
                 model = InceptionTimeRegressor(verbose=args.verbose, n_epochs=n_epochs)
         elif model == "InceptionNetPytorch":
             from src.inception_time.model import InceptionTime
-            n_epochs = 30
+            n_epochs = 300
             if args.save_model_path != 'False':
-                model_path = os.path.join(args.save_model_path, f"{model}_{os.path.basename(dataset_path)}.pkl")
-                model = InceptionTime(verbose=args.verbose, file_path = model_path, save_best_model = True, epochs=n_epochs)
+                model = InceptionTime(verbose=args.verbose, save_best_model = True, epochs=n_epochs)
             else:
                 model = InceptionTime(verbose=args.verbose, epochs=n_epochs)
         else:
