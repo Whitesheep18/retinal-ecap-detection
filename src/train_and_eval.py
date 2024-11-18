@@ -14,10 +14,17 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     y = np.load(os.path.join(dataset, "y_reg.npy"))
     SNR = dataset.split('_')[2]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
     if verbose: print(f"Training model {model}")
-    model.fit(X_train, y_train)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
+    
+    if model_name == 'InceptionTime':
+        model.fit(X_train, y_train, X_val, y_val)
+    
+    else: 
+        model.fit(X_train, y_train)
+    
     y_pred = model.predict(X_test)
 
     if verbose: print("Evaluating model")
