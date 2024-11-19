@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 import ast
 
-def RMSE_SNR_plot(csv_file_path):
+def RMSE_SNR_plot(csv_file_path, y_range=(0, 10)):
     # Load the CSV file
     data = pd.read_csv(csv_file_path)
 
@@ -22,9 +22,12 @@ def RMSE_SNR_plot(csv_file_path):
     plt.ylabel('RMS')
     plt.title('SNR vs. RMS for Different Models')
     plt.legend(title='Models')
+    plt.ylim(*y_range)
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'snr_rms_plot_{timestamp}.png'
+    if not os.path.exists('./plots'):
+        os.mkdir('./plots')
     filepath = os.path.join('./plots', filename)
     plt.savefig(filepath)
     plt.close()  
@@ -61,6 +64,8 @@ def pred_test_plot(csv_file_path, model_name):
     plt.legend(title='SNR levels')
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'{model_name}_y_test_y_pred_plot_{timestamp}.png'
+    if not os.path.exists('./plots'):
+        os.mkdir('./plots')
     filepath = os.path.join('./plots', filename)
     plt.savefig(filepath)
     plt.close()
@@ -90,6 +95,8 @@ def residual_plot(csv_file_path, model_name, snr_value):
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'{model_name}_residual_plot_{snr_value}_{timestamp}.png'
+    if not os.path.exists('./plots'):
+        os.mkdir('./plots')
     filepath = os.path.join('./plots', filename)
     plt.savefig(filepath)
     plt.close()
@@ -98,6 +105,6 @@ def residual_plot(csv_file_path, model_name, snr_value):
     
 
 
-RMSE_SNR_plot('results/results.csv')
-pred_test_plot('results/results.csv', 'LinearRegression')
-residual_plot('results/results.csv', 'LinearRegression', 20)
+RMSE_SNR_plot('spike_detection/results.csv')
+pred_test_plot('spike_detection/results.csv', 'TresholdBased')
+residual_plot('spike_detection/results.csv', 'TresholdBased', 20)
