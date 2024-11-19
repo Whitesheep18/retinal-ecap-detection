@@ -56,7 +56,7 @@ if __name__ == "__main__":
             from src.inception_time.model import InceptionTime
             n_epochs = 300
             if args.save_model_path != 'False':
-                model = InceptionTime(verbose=args.verbose, save_best_model = True, epochs=n_epochs)
+                model = InceptionTime(verbose=args.verbose, epochs=n_epochs)
             else:
                 model = InceptionTime(verbose=args.verbose, epochs=n_epochs)
         else:
