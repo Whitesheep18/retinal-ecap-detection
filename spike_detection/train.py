@@ -39,8 +39,8 @@ if __name__ == "__main__":
             from sklearn.linear_model import LinearRegression
             model = LinearRegression()
         elif model == "TresholdBased":
-            from src.treshold_based import TresholdBased
-            model = TresholdBased()
+            from src.treshold_based import ThresholdBased
+            model = ThresholdBased()
         elif model == "FreshPRINCE":        
             from aeon.regression.feature_based import FreshPRINCERegressor
             model = FreshPRINCERegressor(verbose=args.verbose, default_fc_parameters='efficient', n_estimators=100)

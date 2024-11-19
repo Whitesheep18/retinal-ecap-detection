@@ -2,7 +2,7 @@
 import numpy as np
 
 
-class TresholdBased():
+class ThresholdBased():
     """
     Treshold-based spike-counting method. AKA "Jespers method". 
 
