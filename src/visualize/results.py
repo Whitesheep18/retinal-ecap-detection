@@ -106,5 +106,5 @@ def residual_plot(csv_file_path, model_name, snr_value):
 
 
 RMSE_SNR_plot('spike_detection/results.csv')
-pred_test_plot('spike_detection/results.csv', 'TresholdBased')
-residual_plot('spike_detection/results.csv', 'TresholdBased', 20)
+pred_test_plot('spike_detection/results.csv', 'ThresholdBased')
+residual_plot('spike_detection/results.csv', 'ThresholdBased', 20)
