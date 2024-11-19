@@ -203,12 +203,13 @@ class InceptionTime():
         # Scale the data.
         x = x[:, np.newaxis, :]
         x = torch.from_numpy((x - self.mu) / self.sigma).float().to(self.device)
-        
+
+
         # Get the predicted probabilities.
         with torch.no_grad():
             # TODO: eval mode
-            output = torch.concat([torch.nn.functional.softmax(model(x), dim=-1).unsqueeze(-1) for model in self.models], dim=-1).mean(-1)
-        
+            output = torch.concat([model(x).unsqueeze(-1) for model in self.models], dim=-1).mean(-1)
+
         # Get the predicted labels.
         y = output.detach().cpu().numpy().flatten()
 
@@ -297,11 +298,12 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 2, epochs=100)
+    model = InceptionTime(n_models = 2, epochs=3)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred = model.predict(X_test)
     print(root_mean_squared_error(y_test, y_pred))
+    # print(y_pred)
 
     # model.save('../../models/InceptionTime_DS_80_10_100')
 
