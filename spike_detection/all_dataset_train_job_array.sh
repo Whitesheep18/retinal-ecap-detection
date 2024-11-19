@@ -12,8 +12,8 @@
 # Initialize Python environment
 source ../irishcream/bin/activate
 
-python spike_detection/train.py --models DrCIF --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
-#python spike_detection/train.py --models LinearRegression FreshPRINCE DrCIF InceptionNet --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
+python spike_detection/train.py --models TresholdBased --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
+#python spike_detection/train.py --models LinearRegression TresholdBased FreshPRINCE DrCIF InceptionNet --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
 
 
 # run with: bsub < spike_detection/all_dataset_train_job_array.sh
