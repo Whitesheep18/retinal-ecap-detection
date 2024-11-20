@@ -13,6 +13,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
     SNR = dataset.split('_')[2]
+    ME = dataset.split('_')[3]
 
     if verbose: print(f"Training model {model}")
 
@@ -41,7 +42,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         writer = csv.writer(f)
         
         if not file_exists:
-            writer.writerow(["Date", "Model", "RMSE", "R2", "Dataset", "SNR", "y_pred", "y_test", "comment"])
+            writer.writerow(["Date", "Model", "RMSE", "R2", "Dataset", "SNR", "ME", "y_pred", "y_test", "comment"])
         
         y_pred = ', '.join(map(str, y_pred))
         y_test = ', '.join(map(str, y_test))
@@ -52,7 +53,8 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             rmse, 
             r2, 
             dataset.split('/')[-1],  # Get the dataset name from the path
-            SNR, 
+            SNR,
+            ME, 
             y_pred,
             y_test, 
             comment
