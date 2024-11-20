@@ -56,6 +56,8 @@ class InceptionTime():
         self.filters = filters
         self.depth = depth
         self.n_models = n_models
+        self.train_loss = [[] for i in range(n_models)]
+        self.valid_loss = [[] for i in range(n_models)]
 
 
     def _set_scalers(self, x):
@@ -146,6 +148,7 @@ class InceptionTime():
             with tqdm(range(num_steps)) as pbar:
                 running_loss = 0.0
                 epoch_loss = 0.0
+                avg_val_loss = 0.0
                 for step in pbar:
                     features, target = next(iter(train_dataset))
                     optimizer.zero_grad()
@@ -159,12 +162,13 @@ class InceptionTime():
                     # Report
                     if step % 10 ==0 and self.verbose:
                         loss = loss.detach().cpu()
-                        pbar.set_description(f"epoch={epoch+1}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}")
+                        pbar.set_description(f"epoch={epoch+1}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}, valid_loss={avg_val_loss:.1f}")
 
                     if (step+1) % len(train_dataset) == 0:
                         epoch_loss = running_loss/len(train_dataset)
                         running_loss = 0.0
-                        print(f"Epoch {epoch+1}, Training Loss: {epoch_loss:.4f}")
+                        self.train_loss[m].append(epoch_loss)
+
                         # Validation
                         self.models[m].eval()
                         val_loss = 0.0
@@ -174,7 +178,7 @@ class InceptionTime():
                                 val_loss += loss_fn(val_output, y_val.float().to(self.device)).item()
                         self.models[m].train(True)
                         avg_val_loss = val_loss / len(val_dataset)
-                        print(f"Epoch {epoch+1}, Validation Loss: {avg_val_loss:.4f}")
+                        self.valid_loss[m].append(avg_val_loss)
                         epoch += 1
                         
 
@@ -291,22 +295,25 @@ if __name__ == '__main__':
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import root_mean_squared_error
 
-    dataset = 'simulated_data/DS_80_10_100'
+    dataset = 'simulated_data/DS_80_10_10'
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 2, epochs=3)
+    model = InceptionTime(n_models = 5, epochs=6)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred = model.predict(X_test)
     print(root_mean_squared_error(y_test, y_pred))
+
+    from src.visualize.training import plot_loss
+    plot_loss(model.train_loss, model.valid_loss)
     # print(y_pred)
 
-    # model.save('../../models/InceptionTime_DS_80_10_100')
+    # model.save('../../models/InceptionTime_DS_80_10_10')
 
     # model2 = InceptionTime()
-    # model2.load('../../models/InceptionTime_DS_80_10_100')
+    # model2.load('../../models/InceptionTime_DS_80_10_10')
     
