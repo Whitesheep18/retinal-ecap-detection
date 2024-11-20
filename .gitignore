@@ -3,6 +3,7 @@ data/*
 simulated_data/*
 models/*
 outs/*
+plots/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
