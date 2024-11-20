@@ -1,6 +1,7 @@
 import numpy as np
 import neo
 import os
+import re
 
 def get_signal(filepath='../data/10Hz_1V_neg500mV_1ms003.ns5', verbose=1):
     reader = neo.io.BlackrockIO(filename=filepath)
@@ -40,3 +41,12 @@ def get_template(template_type, path_to_templates = '../retinal-ecap-detection/s
         return np.load(f"{path_to_templates}/AP_templates.npy")
     else:
         raise Exception(f"Template {template_type} not found. Use either 'SA', 'ME' or 'AP'")
+
+# Define a sorting key based on SNR and ME values
+def sorting_key(dataset_name):
+    match = re.match(r"DS_(-?\d+)_(-?\d+)_100", dataset_name)
+    if match:
+        snr = int(match.group(1))
+        me = int(match.group(2))
+        return (snr, me)  
+    return (float('inf'), float('inf'))

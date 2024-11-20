@@ -14,6 +14,7 @@ if __name__ == "__main__":
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import root_mean_squared_error, r2_score
     from src.train_and_eval import train_and_eval
+    from src.utils import sorting_key
 
     parser = argparse.ArgumentParser(description='Train a model on the simulated data')
     parser.add_argument('--models', type=str, required=True, nargs='*', default='LinearRegression', help='model or models to train')
@@ -27,6 +28,7 @@ if __name__ == "__main__":
 
     if args.dataset_idx is not None:
         datasets = [x for x in os.listdir('simulated_data') if x.startswith('DS')]
+        datasets = sorted(datasets, key=sorting_key)
         dataset_path = os.path.join('simulated_data', datasets[args.dataset_idx-1])
     elif args.dataset is not None:
         dataset_path = os.path.join('simulated_data', args.dataset)
