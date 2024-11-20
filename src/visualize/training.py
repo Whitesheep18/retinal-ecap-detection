@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 import numpy as np
 
-def plot_loss(train_loss, validation_loss=None, title='Loss'):
+def plot_loss(train_loss, validation_loss=None, title='Loss', id=''):
     """ if valid loss is None only plotting train loss """
     num_models = len(train_loss)
     num_epochs = len(train_loss[0])
@@ -19,7 +19,7 @@ def plot_loss(train_loss, validation_loss=None, title='Loss'):
     plt.ylabel('Loss')
     plt.legend()
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'loss_{timestamp}.png'
+    filename = f'loss_{id}_{timestamp}.png'
     if not os.path.exists('./plots'):
         os.mkdir('./plots')
     filepath = os.path.join('./plots', filename)

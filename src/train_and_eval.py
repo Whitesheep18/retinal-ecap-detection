@@ -68,4 +68,8 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}")
             model.save(model_path)
 
+    if model_name == 'InceptionTime':
+        from src.visualize.training import plot_loss
+        plot_loss(model.train_loss, model.valid_loss, title=f'Trained on {os.path.basename(dataset)}', id=comment)
+
     
