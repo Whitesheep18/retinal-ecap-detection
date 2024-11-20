@@ -39,7 +39,7 @@ def pred_test_plot(csv_file_path, model_name):
         print(f"No data found for Model: {model_name}")
         return
 
-    snr_levels = filtered_data['SNR'].unique()
+    snr_levels = sorted(filtered_data['SNR'].unique())
     colors = plt.cm.get_cmap('tab10', len(snr_levels))  # Choose a colormap
     
     plt.figure(figsize=(10, 6))
@@ -51,7 +51,7 @@ def pred_test_plot(csv_file_path, model_name):
         y_test = snr_data['y_test'].apply(lambda x: [float(num) for num in x.split(',')])
         y_test = [item for sublist in y_test for item in sublist]
         
-        plt.scatter(y_test, y_pred, color=colors(idx), label=f'SNR {snr_value}', alpha=0.7)
+        plt.scatter(y_test, y_pred, color=colors(idx), label=f'SNR {snr_value}', alpha=0.5)
     
     # Add labels and title
     plt.xlabel('Real values')
@@ -98,6 +98,6 @@ def residual_plot(csv_file_path, model_name, snr_value):
     
 
 
-RMSE_SNR_plot('results/results.csv')
-pred_test_plot('results/results.csv', 'LinearRegression')
-residual_plot('results/results.csv', 'LinearRegression', 20)
+# RMSE_SNR_plot('spike_detection/results_inception_plain.csv')
+pred_test_plot('spike_detection/results_inception_plain.csv', 'InceptionTime')
+# residual_plot('spike_detection/results.csv', 'InceptionTime', 10)
