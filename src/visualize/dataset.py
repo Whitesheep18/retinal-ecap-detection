@@ -56,7 +56,7 @@ def plot_ds_overview(path_to_datasets, num_samples):
     ncols = 2
     nrows = int(np.ceil(len(datasets)/ncols))
     fig, axs = plt.subplots(nrows, ncols)
-    fig.set_figheight(3*ncols*1.1)
+    fig.set_figheight(4*ncols*1.1)
     fig.set_figwidth(4*nrows*1.1)
     for i in range(nrows):
         for j in range(ncols):
@@ -94,5 +94,5 @@ def plot_ds_overview(path_to_datasets, num_samples):
 
 
 if __name__ == "__main__":
-    #plot_random_sample('simulated_data/DS_20_10_10', 2)
-    plot_ds_overview('simulated_data', 5)
+    plot_random_sample('simulated_data/DS_50_0_10', 2)
+    #plot_ds_overview('simulated_data', 5)
