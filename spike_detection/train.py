@@ -45,7 +45,7 @@ if __name__ == "__main__":
         if model == "LinearRegression":
             from sklearn.linear_model import LinearRegression
             model = LinearRegression()
-        elif model == "TresholdBased":
+        elif model == "ThresholdBased":
             from src.threshold_based import ThresholdBased
             model = ThresholdBased()
         elif model == "FreshPRINCE":        

@@ -43,6 +43,11 @@ class ThresholdBased():
         for i in range(n):
             y[i] = self._predict_stimulation(x[i])
         return y
+    
+    def get_params(self):
+        return {"noise_factor": self.noise_factor,
+                "noise_method": self.noise_method,
+                "patience"    : self.patience}
 
             
 
