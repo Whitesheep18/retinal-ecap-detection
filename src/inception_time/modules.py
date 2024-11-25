@@ -107,12 +107,13 @@ class Lambda(torch.nn.Module):
 
 
 class InceptionModel(torch.nn.Module):
-    def __init__(self, input_size, filters, depth):
+    def __init__(self, input_size, filters, depth, dropout):
         super(InceptionModel, self).__init__()
 
         self.input_size = input_size
         self.filters = filters
         self.depth = depth
+        self.dropout = dropout
         
         modules = OrderedDict()
         
@@ -129,16 +130,19 @@ class InceptionModel(torch.nn.Module):
         
         modules['avg_pool'] = Lambda(f=lambda x: torch.mean(x, dim=-1))
         modules['linear'] = torch.nn.Linear(in_features=4 * filters, out_features=1)
+        modules['dropout'] = torch.nn.Dropout(dropout)
         
         self.model = torch.nn.Sequential(modules)
 
     def forward(self, x):
         for d in range(self.depth):
             y = self.model.get_submodule(f'inception_{d}')(x if d == 0 else y)
+            y = self.model.get_submodule('dropout')(y) # in general ppl tend to do CNNs > BN > activation > dropout.. and repeat
             if d % 3 == 2:
                 y = self.model.get_submodule(f'residual_{d}')(x, y)
                 x = y
         y = self.model.get_submodule('avg_pool')(y)
         y = self.model.get_submodule('linear')(y)
+        y = self.model.get_submodule('dropout')(y)
         #torch.nn.functional.relu(y)? # counts are never negative. maybe log-exp space is better? maybe it should be handled in the loss function
         return y

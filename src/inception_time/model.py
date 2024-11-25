@@ -13,6 +13,8 @@ class InceptionTime():
                  learning_rate= 0.001,
                  batch_size=32,
                  epochs = 3,
+                 dropout = 0,
+                 l2_penalty = 0,
                  verbose=True
                  ):
         
@@ -52,6 +54,8 @@ class InceptionTime():
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.epochs = epochs
+        self.dropout = dropout
+        self.l2_penalty = l2_penalty
         self.verbose = verbose
         self.filters = filters
         self.depth = depth
@@ -70,6 +74,7 @@ class InceptionTime():
                 input_size=1, # channels
                 filters=self.filters,
                 depth=self.depth,
+                dropout=self.dropout
             ).to(self.device) for _ in range(self.n_models)
         ]
 
@@ -134,7 +139,7 @@ class InceptionTime():
         for m in range(len(self.models)):
             
             # Define the optimizer.
-            optimizer = torch.optim.Adam(self.models[m].parameters(), lr=self.learning_rate)
+            optimizer = torch.optim.Adam(self.models[m].parameters(), lr=self.learning_rate, weight_decay=self.l2_penalty)
             
             # Define the loss function.
             loss_fn = torch.nn.MSELoss()
