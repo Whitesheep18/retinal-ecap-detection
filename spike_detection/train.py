@@ -24,6 +24,11 @@ if __name__ == "__main__":
     parser.add_argument('--dataset_idx', type=int, help='index of the dataset in the folder')
     parser.add_argument('--verbose', type=int, default=1, help="print what's going on")
     parser.add_argument('--comment', type=str, default='', help="anything else (eg. jobid) you want to add")
+    # inception time arguments
+    parser.add_argument('--n_epochs', type=int, default=300, help='number of epochs in InceptionTime (original and ours)')
+    parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate in InceptionTime (original and ours)')
+    parser.add_argument('--dropout', type=float, default=0, help='portion of weights to forget in InceptionTime (ours)')
+    parser.add_argument('--l2_penalty', type=float, default=0, help='l2 penalty in InceptionTime (ours)')
     args = parser.parse_args()
 
     if args.dataset_idx is not None:
@@ -49,21 +54,9 @@ if __name__ == "__main__":
         elif model == "DrCIF":        
             from aeon.regression.interval_based import DrCIFRegressor
             model = DrCIFRegressor(n_estimators=10, min_interval_length= 100, random_state=0)
-        elif model == "InceptionNet":
-            from aeon.regression.deep_learning import InceptionTimeRegressor
-            n_epochs = 300
-            if args.save_model_path != 'False':
-                model_path = os.path.join(args.save_model_path, f"{model}_{os.path.basename(dataset_path)}.pkl")
-                model = InceptionTimeRegressor(verbose=args.verbose, file_path = model_path, save_best_model = True, n_epochs=n_epochs)
-            else:
-                model = InceptionTimeRegressor(verbose=args.verbose, n_epochs=n_epochs)
         elif model == "InceptionNetPytorch":
             from src.inception_time.model import InceptionTime
-            n_epochs = 300
-            if args.save_model_path != 'False':
-                model = InceptionTime(verbose=args.verbose, epochs=n_epochs)
-            else:
-                model = InceptionTime(verbose=args.verbose, epochs=n_epochs)
+            model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, dropout=args.dropout, l2_penalty=args.l2_penalty)
         else:
             print(f"Unknown model {model}")
             sys.exit(1)
