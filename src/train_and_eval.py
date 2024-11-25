@@ -42,7 +42,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         writer = csv.writer(f)
         
         if not file_exists:
-            writer.writerow(["Date", "Model", "RMSE", "R2", "Dataset", "SNR", "ME", "y_pred", "y_test", "comment"])
+            writer.writerow(["Date", "Model", "RMSE", "R2", "Dataset", "SNR", "ME", "y_pred", "y_test", "comment", "params"])
         
         y_pred = ', '.join(map(str, y_pred))
         y_test = ', '.join(map(str, y_test))
@@ -57,7 +57,8 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             ME, 
             y_pred,
             y_test, 
-            comment
+            comment,
+            model.get_params()
         ])
     
     if save_model_path != "False":
