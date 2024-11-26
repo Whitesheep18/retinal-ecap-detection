@@ -134,10 +134,7 @@ class InceptionTime():
             shuffle=False
         )
 
-        # Early stopping parameters
-        patience = 5 
-        best_val_loss = float('inf')
-        patience_counter = 0
+
     
         for m in range(len(self.models)):
             
@@ -153,6 +150,10 @@ class InceptionTime():
 
             num_steps = len(train_dataset)*self.epochs
             epoch = 0
+            # Early stopping parameters
+            patience = 5 
+            best_val_loss = float('inf')
+            patience_counter = 0
             with tqdm(range(num_steps)) as pbar:
                 running_loss = 0.0
                 epoch_loss = 0.0
