@@ -133,9 +133,12 @@ class InceptionTime():
             batch_size=self.batch_size,
             shuffle=False
         )
-    
 
-        
+        # Early stopping parameters
+        patience = 5 
+        best_val_loss = float('inf')
+        patience_counter = 0
+    
         for m in range(len(self.models)):
             
             # Define the optimizer.
@@ -185,6 +188,16 @@ class InceptionTime():
                         avg_val_loss = val_loss / len(val_dataset)
                         self.valid_loss[m].append(avg_val_loss)
                         epoch += 1
+                    
+                        # Early stopping logic
+                        if avg_val_loss < best_val_loss:
+                            best_val_loss = avg_val_loss
+                            patience_counter = 0 
+                        else:
+                            patience_counter += 1
+                            if patience_counter >= patience:
+                                print(f"Early stopping at epoch {epoch}, no improvement in validation loss for {patience} epochs.")
+                                break
                         
 
             self.models[m].train(False)
