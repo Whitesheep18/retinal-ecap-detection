@@ -15,7 +15,7 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
     for model in data['Model'].unique():
         model_data = data[data['Model'] == model]
         if me_level is not None:
-            model_data = data[data['ME'] == me_level]
+            model_data = model_data[model_data['ME'] == me_level]
         plt.scatter(model_data['SNR'], model_data['RMSE'], label=model, s=100)
 
 
@@ -24,7 +24,8 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
     plt.ylabel('RMS')
     plt.title(f'SNR vs. RMS for Different Models {"ME level = "+str(me_level) if me_level is not None else ""}')
     plt.legend(title='Models')
-    plt.ylim(*y_range)
+    if y_range is not None:
+        plt.ylim(*y_range)
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'snr_rms_plot_{timestamp}.png'
@@ -111,6 +112,6 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
     
 
 
-#RMSE_SNR_plot('spike_detection/results.csv', me_level=10)
+RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
 #pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=0)
-residual_plot('spike_detection/results.csv', 'DrCIFRegressor', 0, me_level=10)
+#residual_plot('spike_detection/results.csv', 'DrCIFRegressor', 0, me_level=10)
