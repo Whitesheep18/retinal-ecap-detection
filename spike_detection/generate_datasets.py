@@ -8,7 +8,7 @@ idx = int(sys.argv[1])
 
 snr_range = [-10,0,10,20,50,80]
 snr_value = snr_range[idx-1]
-ME_value = 10
+ME_value = 0
 spontaneous_firing_Hz_value = 10
 folder_name = f"DS_{snr_value}_{ME_value}_{spontaneous_firing_Hz_value}"
 
@@ -20,10 +20,10 @@ os.makedirs(folder_path, exist_ok=True)
 # Define the parameters
 N = 2000 # total dataset size
 num_cells_list = [0, 50]
-ME_amplitude_scaler_list = [ME_value]
+ME_SNR_dB_list = [ME_value]
 spontaneous_firing_Hz_list = [spontaneous_firing_Hz_value]
 AP_amplitude_std_pct_list = [1, 10]
-num_comb = len(num_cells_list) * len(ME_amplitude_scaler_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
+num_comb = len(num_cells_list) * len(ME_SNR_dB_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
 num_samples_per_comb = N//(num_comb)
 
 print(f'Generating {num_samples_per_comb} samples per comb, ie. {num_samples_per_comb*num_comb} samples in total - close to {N}')
@@ -32,7 +32,7 @@ params = {
     "n": num_samples_per_comb,
     "num_cells_list": num_cells_list,
     "white_SNR_dB_list": [snr_value], # len is no datasets
-    "ME_amplitude_scaler_list": ME_amplitude_scaler_list,
+    "ME_SNR_dB_list": ME_SNR_dB_list,
     "spontaneous_firing_Hz_list": spontaneous_firing_Hz_list,
     "AP_amplitude_std_pct_list": AP_amplitude_std_pct_list,
     "first_AP_stim_lambda_ms": 0.2,
