@@ -33,6 +33,7 @@ Train all models:
 ```
 bsub < spike_detection/all_dataset_train_job_array.sh
 ```
+You'll find results in `spike_detection/results.csv` which can be visualized using `src/visualize/results.py`
 
 <span style="font-size: 8px;">*Irish cream is the suggested type of tea for this exercise</span>
 
