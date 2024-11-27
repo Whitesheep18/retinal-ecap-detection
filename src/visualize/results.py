@@ -109,9 +109,57 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
     plt.close()
 
 
+def residual_plot_individual(y_individual, y_test):
+        # Ensure y_test is a 1D array.
+    y_test = np.asarray(y_test).flatten()
+
+    # Ensure shapes match for subtraction.
+    if y_test.shape[0] != y_individual.shape[0]:
+        raise ValueError(f"Shape mismatch: y_test has shape {y_test.shape}, but y_individual has shape {y_individual.shape}")
+
+    # Calculate residuals for each model.
+    residuals = np.squeeze(y_individual) - y_test[:, np.newaxis]
+
+    # Number of models.
+    num_models = residuals.shape[1]
+
+    # Define a list of colors for each model using a colormap
+    colors = plt.cm.get_cmap('tab10', 10)  # Use tab20 for more distinct colors if you have more than 10 models
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    
+    # Plot residuals for each model against y_test.
+    for model_idx in range(num_models):
+        plt.scatter(
+            y_test,                     # True labels (x-axis)
+            residuals[:, model_idx],    # Residuals for the current model (y-axis)
+            label=f'Model {model_idx + 1}',
+            alpha=0.7,
+            s=10,                       # Marker size
+            color=colors(model_idx)     # Use the color from the colormap
+        )
+
+    plt.axhline(0, color='black', linestyle='--', linewidth=1, label='Zero Residual')
+    plt.title("Residuals of Individual Model Predictions vs. y_test")
+    plt.xlabel("y_test (True Labels)")
+    plt.ylabel("Residuals")
+    plt.legend(loc='upper right', fontsize=8)
+    plt.tight_layout()
+
+    # Save the plot to file
+    filename = 'res.png'
+    if not os.path.exists('./plots'):
+        os.mkdir('./plots')
+    filepath = os.path.join('./plots', filename)
+    plt.savefig(filepath)
+    plt.close()
+
+
+
     
 
 
-RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
+#RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
 #pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=0)
 #residual_plot('spike_detection/results.csv', 'DrCIFRegressor', 0, me_level=10)

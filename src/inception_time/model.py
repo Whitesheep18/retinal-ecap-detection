@@ -10,7 +10,7 @@ class InceptionTime():
                  filters=32,
                  depth=6,
                  n_models=5,
-                 learning_rate= 0.001,
+                 learning_rate= 0.0001,
                  batch_size=32,
                  epochs = 3,
                  dropout = 0,
@@ -151,7 +151,7 @@ class InceptionTime():
             num_steps = len(train_dataset)*self.epochs
             epoch = 0
             # Early stopping parameters
-            patience = 5 
+            patience = 10 
             best_val_loss = float('inf')
             patience_counter = 0
             with tqdm(range(num_steps)) as pbar:
@@ -189,17 +189,18 @@ class InceptionTime():
                         avg_val_loss = val_loss / len(val_dataset)
                         self.valid_loss[m].append(avg_val_loss)
                         epoch += 1
-                    
-                        # Early stopping logic
-                        if avg_val_loss < best_val_loss:
-                            best_val_loss = avg_val_loss
-                            patience_counter = 0 
-                        else:
-                            patience_counter += 1
-                            if patience_counter >= patience:
-                                print(f"Early stopping at epoch {epoch}, no improvement in validation loss for {patience} epochs.")
-                                break
-                        
+
+                        if epoch < 10:
+                            # Early stopping logic
+                            if avg_val_loss < best_val_loss:
+                                best_val_loss = avg_val_loss
+                                patience_counter = 0 
+                            else:
+                                patience_counter += 1
+                                if patience_counter >= patience:
+                                    print(f"Early stopping at epoch {epoch}, no improvement in validation loss for {patience} epochs.")
+                                    break
+                            
 
             self.models[m].train(False)
 
@@ -230,14 +231,17 @@ class InceptionTime():
 
         # Get the predicted probabilities.
         with torch.no_grad():
-            # TODO: eval mode
-            output = torch.concat([model(x).unsqueeze(-1) for model in self.models], dim=-1).mean(-1)
+            outputs = torch.concat([model(x).unsqueeze(-1) for model in self.models], dim=-1)
 
-        # Get the predicted labels.
-        y = output.detach().cpu().numpy().flatten()
+        # Convert outputs to numpy array for individual predictions.
+        y_individual = outputs.detach().cpu().numpy()
 
-        return y
+        # Calculate the average prediction.
+        y_avg = y_individual.mean(axis=-1)
+
+        return y_avg, y_individual
     
+
     def save(self, file_path):
 
         meta_file_path = f"{file_path}_metadata.pkl"
@@ -313,6 +317,8 @@ if __name__ == '__main__':
     import os
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import root_mean_squared_error
+    import matplotlib.pyplot as plt
+    import numpy as np
 
     dataset = 'simulated_data/DS_80_10_10'
     X = np.load(os.path.join(dataset, "X.npy"))
@@ -321,15 +327,18 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 5, epochs=6)
+    model = InceptionTime(n_models = 5, epochs=3)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
-    y_pred = model.predict(X_test)
+    y_pred, y_individual = model.predict(X_test)
     print(root_mean_squared_error(y_test, y_pred))
+    
 
     from src.visualize.training import plot_loss
     plot_loss(model.train_loss, model.valid_loss)
     # print(y_pred)
+    from src.visualize.results import residual_plot_individual
+    residual_plot_individual(y_test=y_test, y_individual=y_individual)
 
     # model.save('../../models/InceptionTime_DS_80_10_10')
 
