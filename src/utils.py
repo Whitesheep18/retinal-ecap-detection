@@ -44,7 +44,7 @@ def get_template(template_type, path_to_templates = '../retinal-ecap-detection/s
 
 # Define a sorting key based on SNR and ME values
 def sorting_key(dataset_name):
-    match = re.match(r"DS_(-?\d+)_(-?\d+)_100", dataset_name)
+    match = re.match(r"DS_(-?\d+)_(-?\d+)_10", dataset_name)
     if match:
         snr = int(match.group(1))
         me = int(match.group(2))

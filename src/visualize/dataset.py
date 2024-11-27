@@ -93,6 +93,35 @@ def plot_ds_overview(path_to_datasets, num_samples):
     plt.close()
 
 
+def plot_target_value_distribution(path_to_datasets):
+    from src.utils import sorting_key
+    import seaborn as sns
+
+    datasets = [x for x in os.listdir(path_to_datasets) if x.startswith('DS')]
+    datasets = sorted(datasets, key=sorting_key)
+    plt.figure(figsize=(10, 7))
+    for dataset in datasets:
+        y = np.load(os.path.join(path_to_datasets, dataset, "y_reg.npy"))
+        y = y[y!=0]
+        density = sns.kdeplot(y, label=dataset)
+    
+    plt.title("Distribution of non-zero counts for all datasets")
+    plt.legend()
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+    filename = f'target_dists_{timestamp}.png'
+    if not os.path.exists('./plots'):
+        os.mkdir('./plots')
+    filepath = os.path.join('./plots', filename)
+    plt.tight_layout()
+    plt.savefig(filepath)
+    plt.close()
+
+
+
+
+
+
 if __name__ == "__main__":
-    plot_random_sample('simulated_data/DS_50_0_10', 2)
+    #plot_random_sample('simulated_data/DS_50_0_10', 2)
     #plot_ds_overview('simulated_data', 5)
+    plot_target_value_distribution('simulated_data')
