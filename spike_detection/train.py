@@ -60,8 +60,6 @@ if __name__ == "__main__":
         elif model == 'Classification':
             from sklearn.ensemble import RandomForestClassifier
             model = RandomForestClassifier()
-            train_and_eval_classification(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
-            break
         else:
             print(f"Unknown model {model}")
             sys.exit(1)
