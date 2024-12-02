@@ -57,6 +57,9 @@ if __name__ == "__main__":
         elif model == "InceptionNetPytorch":
             from src.inception_time.model import InceptionTime
             model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, dropout=args.dropout, l2_penalty=args.l2_penalty)
+        elif model == "AverageMethod":
+            from src.average_method import AveragePredictionModel
+            model = AveragePredictionModel()
         else:
             print(f"Unknown model {model}")
             sys.exit(1)

@@ -47,14 +47,15 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     
     if model_name == 'InceptionTime':
         model.fit(X_class1_train, y_reg_class1_train, X_class1_val, y_reg_class1_val)
-    
     else: 
         model.fit(X_class1_train, y_reg_class1_train)
-    
-    y_pred = model.predict(X_class1_test)
+
+    if  model_name == "AveragePredictionModel":
+        y_pred = model.predict(y_reg_class1_train,y_reg_class1_test)
+    else:
+        y_pred = model.predict(X_class1_test)
 
     if verbose: print("Evaluating model")
-    print(y_reg_class1_test)
 
     r2 = r2_score(y_reg_class1_test, y_pred)
     rmse = root_mean_squared_error(y_reg_class1_test, y_pred)
