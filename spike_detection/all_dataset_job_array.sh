@@ -1,5 +1,5 @@
 #!/bin/bash
-#BSUB -J gen[1-6]
+#BSUB -J gen[1-12]
 #BSUB -q hpc
 #BSUB -W 4:00
 #BSUB -n 1
@@ -13,6 +13,6 @@
 # Initialize Python environment
 source ../irishcream/bin/activate
 
-python spike_detection/generate_datasets.py $LSB_JOBINDEX
+python spike_detection/generate_datasets.py $LSB_JOBINDEX 
 
 # run with: bsub < spike_detection/all_dataset_job_array.sh
