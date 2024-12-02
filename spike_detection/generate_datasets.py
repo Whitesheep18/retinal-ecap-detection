@@ -7,13 +7,19 @@ import sys
 idx = int(sys.argv[1])
 
 white_snr_range = [-10,0,10,20,50,80]
-me_snr_range = [0, 10]
+ME_snr_range = [0, 10]
 
-white_snr_value = white_snr_range[(idx-1)%len(white_snr_range)]
-white_ME_value = white_snr_range[(idx-1)//len(white_snr_range)]
+white_snr_idx = (idx-1)%len(white_snr_range)
+ME_snr_idx = (idx-1)//len(white_snr_range)
+
+white_snr_value = white_snr_range[white_snr_idx]
+ME_snr_value = ME_snr_range[ME_snr_idx]
+
+print(f"SNR: idx {white_snr_idx}, value {white_snr_value}")
+print(f"ME: idx {ME_snr_idx}, value {ME_snr_value}")
 
 spontaneous_firing_Hz_value = 10
-folder_name = f"DS_{white_snr_value}_{white_ME_value}_{spontaneous_firing_Hz_value}"
+folder_name = f"DS_{white_snr_value}_{ME_snr_value}_{spontaneous_firing_Hz_value}"
 
 # Define the base directory for saving data
 base_directory = 'simulated_data'
@@ -23,7 +29,7 @@ os.makedirs(folder_path, exist_ok=True)
 # Define the parameters
 N = 2000 # total dataset size
 num_cells_list = [0, 50]
-ME_SNR_dB_list = [white_ME_value]
+ME_SNR_dB_list = [ME_snr_value]
 spontaneous_firing_Hz_list = [spontaneous_firing_Hz_value]
 AP_amplitude_std_pct_list = [1, 10]
 num_comb = len(num_cells_list) * len(ME_SNR_dB_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
@@ -54,6 +60,7 @@ with open(os.path.join(folder_path, 'params.json'), 'w') as params_file:
     json.dump(params, params_file, indent=4)
 
 # Generate the dataset
+np.random.seed(42)
 X, y_reg = make_dataset_stim(**params)
 
 # Save X and y_reg to files
