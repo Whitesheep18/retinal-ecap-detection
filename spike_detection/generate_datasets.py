@@ -6,11 +6,14 @@ import sys
 
 idx = int(sys.argv[1])
 
-snr_range = [-10,0,10,20,50,80]
-snr_value = snr_range[idx-1]
-ME_value = 0
+white_snr_range = [-10,0,10,20,50,80]
+me_snr_range = [0, 10]
+
+white_snr_value = white_snr_range[(idx-1)%len(white_snr_range)]
+white_ME_value = white_snr_range[(idx-1)//len(white_snr_range)]
+
 spontaneous_firing_Hz_value = 10
-folder_name = f"DS_{snr_value}_{ME_value}_{spontaneous_firing_Hz_value}"
+folder_name = f"DS_{white_snr_value}_{white_ME_value}_{spontaneous_firing_Hz_value}"
 
 # Define the base directory for saving data
 base_directory = 'simulated_data'
@@ -20,7 +23,7 @@ os.makedirs(folder_path, exist_ok=True)
 # Define the parameters
 N = 2000 # total dataset size
 num_cells_list = [0, 50]
-ME_SNR_dB_list = [ME_value]
+ME_SNR_dB_list = [white_ME_value]
 spontaneous_firing_Hz_list = [spontaneous_firing_Hz_value]
 AP_amplitude_std_pct_list = [1, 10]
 num_comb = len(num_cells_list) * len(ME_SNR_dB_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
@@ -31,7 +34,7 @@ print(f'Generating {num_samples_per_comb} samples per comb, ie. {num_samples_per
 params = {
     "n": num_samples_per_comb,
     "num_cells_list": num_cells_list,
-    "white_SNR_dB_list": [snr_value], # len is no datasets
+    "white_SNR_dB_list": [white_snr_value], # len is no datasets
     "ME_SNR_dB_list": ME_SNR_dB_list,
     "spontaneous_firing_Hz_list": spontaneous_firing_Hz_list,
     "AP_amplitude_std_pct_list": AP_amplitude_std_pct_list,

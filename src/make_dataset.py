@@ -7,7 +7,7 @@ def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size
     """
     SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(num_stim, verbose=0)
     white_noise = rec.create_white_noise(data, SNR_dB=white_SNR_dB)
-    me_noise = rec.create_mains_electricity_noise(data, amplitude_scaler=ME_SNR_dB)
+    me_noise = rec.create_mains_electricity_noise(data, SNR_dB=ME_SNR_dB)
     noised_data = data + white_noise + me_noise
 
     SA_ends = [idx[-1] for idx in SA_indexes]
