@@ -15,6 +15,7 @@ ME_snr_idx = (idx-1)//len(white_snr_range)
 white_snr_value = white_snr_range[white_snr_idx]
 ME_snr_value = ME_snr_range[ME_snr_idx]
 
+print(f"IDX: {idx}")
 print(f"SNR: idx {white_snr_idx}, value {white_snr_value}")
 print(f"ME: idx {ME_snr_idx}, value {ME_snr_value}")
 
