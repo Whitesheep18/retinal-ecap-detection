@@ -13,7 +13,7 @@ if __name__ == "__main__":
     import datetime as dt
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import root_mean_squared_error, r2_score
-    from src.train_and_eval import train_and_eval
+    from src.train_and_eval import train_and_eval, train_and_eval_classification
     from src.utils import sorting_key
 
     parser = argparse.ArgumentParser(description='Train a model on the simulated data')
@@ -57,6 +57,11 @@ if __name__ == "__main__":
         elif model == "InceptionNetPytorch":
             from src.inception_time.model import InceptionTime
             model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, dropout=args.dropout, l2_penalty=args.l2_penalty)
+        elif model == 'Classification':
+            from sklearn.ensemble import RandomForestClassifier
+            model = RandomForestClassifier()
+            train_and_eval_classification(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
+            break
         else:
             print(f"Unknown model {model}")
             sys.exit(1)
