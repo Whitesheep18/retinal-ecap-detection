@@ -190,6 +190,7 @@ class RecordingGenerator():
     
 if __name__ == "__main__":
     import os
+    np.random.seed(42)
                 
     rec = RecordingGenerator(
         first_AP_stim_lambda_ms = 0.2,

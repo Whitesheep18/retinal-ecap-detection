@@ -1,5 +1,6 @@
 import numpy as np
 from src.recording_generator import RecordingGenerator
+np.random.seed(42)
 
 def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size = 2700, white_SNR_dB=20, ME_SNR_dB=0):
     """
@@ -91,3 +92,4 @@ if __name__ == "__main__":
     X, y_reg = make_dataset_stim(num_cells_list=[0, 50], white_SNR_dB_list=[10,20,50],   
                                 ME_SNR_dB_list=[10, 50], spontaneous_firing_Hz_list=[100,1000],   
                                 AP_amplitude_std_pct_list=[1, 10, 20])
+    
