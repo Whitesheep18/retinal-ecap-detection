@@ -26,11 +26,11 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     
     if model_name == 'InceptionTime':
         model.fit(X_train, y_train, X_val, y_val)
+        y_pred, y_pred_individual = model.predict(X_test)
     
     else: 
         model.fit(X_train, y_train)
-    
-    y_pred = model.predict(X_test)
+        y_pred = model.predict(X_test)
 
     if verbose: print("Evaluating model")
 
