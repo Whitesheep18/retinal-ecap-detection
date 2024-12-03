@@ -5,49 +5,62 @@ import numpy as np
 from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score
 from sklearn.model_selection import train_test_split
 import csv
+from sklearn.ensemble import RandomForestClassifier
 
 def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=''):
 
+    classifier = RandomForestClassifier()
     model_name = model.__class__.__name__
 
     X = np.load(os.path.join(dataset, "X.npy"))
-    y = np.load(os.path.join(dataset, "y_reg.npy"))
-
-    if model_name == "RandomForestClassifier":
-        y = [0 if value < 5 else 1 for value in y]
+    y_reg = np.load(os.path.join(dataset, "y_reg.npy"))
+    y_class = [0 if value < 5 else 1 for value in y_reg]
 
     SNR = dataset.split('_')[2]
     ME = dataset.split('_')[3]
 
-    if verbose: print(f"Training model {model}")
+    if verbose: print(f"Training classification model {model}")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-    X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
+    X_train, X_temp, y_class_train, y_class_temp, y_reg_train, y_reg_temp = train_test_split(
+        X, y_class, y_reg, test_size=0.3, random_state=42)
+    X_val, X_test, y_class_val, y_class_test, y_reg_val, y_reg_test = train_test_split(
+        X_temp, y_class_temp, y_reg_temp, test_size=0.5, random_state=42)
+
+    classifier.fit(X_train, y_class_train)
+    y_class_val_pred = classifier.predict(X_val)
+    y_class_test_pred = classifier.predict(X_test)
+    accuracy = accuracy_score(y_class_test, y_class_test_pred)
+    if verbose: print("Test Classifier Accuracy:", accuracy)
+
+    class1_indices_val = y_class_val_pred == 1
+    X_class1_val = X_val[class1_indices_val]
+    y_reg_class1_val = y_reg_val[class1_indices_val]
+
+    class1_indices_train = np.array(y_class_train) == 1
+    X_class1_train = X_train[class1_indices_train]
+    y_reg_class1_train = y_reg_train[class1_indices_train]
+
+    class1_indices_test = np.array(y_class_test_pred) == 1
+    X_class1_test = X_test[class1_indices_test]
+    y_reg_class1_test = y_reg_test[class1_indices_test]
+
     
     if model_name == 'InceptionTime':
-        model.fit(X_train, y_train, X_val, y_val)
-        y_pred, y_pred_individual = model.predict(X_test)
-    
+        model.fit(X_class1_train, y_reg_class1_train, X_class1_val, y_reg_class1_val)
     else: 
-        model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
+        model.fit(X_class1_train, y_reg_class1_train)
+
+    if  model_name == "AveragePredictionModel":
+        y_pred = model.predict(y_reg_class1_train,X_class1_test)
+    else:
+        y_pred = model.predict(X_class1_test)
 
     if verbose: print("Evaluating model")
 
-    rmse = ""
-    accuracy = ""
-    r2 = r2_score(y_test, y_pred)
+    r2 = r2_score(y_reg_class1_test, y_pred)
+    rmse = root_mean_squared_error(y_reg_class1_test, y_pred)
 
-    if model_name == "RandomForestClassifier":
-        accuracy = accuracy_score(y_test, y_pred)
-    else:
-        rmse = root_mean_squared_error(y_test, y_pred)
-
-    if verbose:
-        if model_name == "RandomForestClassifier":
-            print(f"Accuracy: {accuracy}, R2: {r2}")
-        else:
-            print(f"RMSE: {rmse}, R2: {r2}")
+    if verbose: print(f"RMSE: {rmse}, R2: {r2}")
         
     results_dir = os.path.dirname(results)
     if results_dir and not os.path.exists(results_dir):
@@ -61,7 +74,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             writer.writerow(["Date", "Model", "RMSE", "Accuracy", "R2", "Dataset", "SNR", "ME", "y_pred", "y_test", "comment", "params"])
         
         y_pred = ', '.join(map(str, y_pred))
-        y_test = ', '.join(map(str, y_test))
+        y_test = ', '.join(map(str, y_reg_class1_test))
         # Write the data row
         writer.writerow([
             dt.datetime.now(), 
