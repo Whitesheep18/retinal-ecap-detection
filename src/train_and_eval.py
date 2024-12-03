@@ -51,7 +51,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         model.fit(X_class1_train, y_reg_class1_train)
 
     if  model_name == "AveragePredictionModel":
-        y_pred = model.predict(y_reg_class1_train,y_reg_class1_test)
+        y_pred = model.predict(y_reg_class1_train,X_class1_test)
     else:
         y_pred = model.predict(X_class1_test)
 
