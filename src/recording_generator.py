@@ -207,8 +207,8 @@ if __name__ == "__main__":
         )
     
     SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(2, verbose=0)
-    white_noise = rec.create_white_noise(data, SNR_dB=10)
-    me_noise = rec.create_mains_electricity_noise(data, SNR_dB=10)
+    white_noise = rec.create_white_noise(data, SNR_dB=80)
+    me_noise = rec.create_mains_electricity_noise(data, SNR_dB=30)
     noised_data = data + white_noise + me_noise
 
     os.makedirs('./plots/simulated_data', exist_ok=True) 
