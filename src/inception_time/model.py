@@ -244,7 +244,7 @@ class InceptionTime():
         y_individual = outputs.detach().cpu().numpy()
 
         # Calculate the average prediction.
-        y_avg = y_individual.mean(axis=-1)
+        y_avg = y_individual.mean(axis=-1).flatten()
 
         return y_avg, y_individual
     
