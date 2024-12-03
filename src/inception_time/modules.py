@@ -63,13 +63,24 @@ class Inception(torch.nn.Module):
         )
 
     def forward(self, x):
+        #print()
+        #print("input to inception block", x.shape)
         x0 = self.bottleneck1(x)
+        #print("after bottleneck", x0.shape)
         x1 = self.conv10(x0)
+        #print("after conv10", x1.shape)
         x2 = self.conv20(x0)
+        #print("after conv20", x2.shape)
         x3 = self.conv40(x0)
-        x4 = self.bottleneck2(self.max_pool(x))
+        #print("after conv40", x3.shape)
+        temp = self.max_pool(x)
+        #print("after max pool", temp.shape)
+        x4 = self.bottleneck2(temp)
+        #print("after bootleneck of max pool", x4.shape)        
         y = torch.concat([x1, x2, x3, x4], dim=1)
         y = torch.nn.functional.relu(self.batch_norm(y))
+        #print("after concat and batch norm and relu",y.shape)
+        #wlskfjm
         return y
 
 
@@ -107,15 +118,23 @@ class Lambda(torch.nn.Module):
 
 
 class InceptionModel(torch.nn.Module):
-    def __init__(self, input_size, filters, depth, dropout):
+    def __init__(self, input_size, filters, depth, dropout, init_stride=-1):
         super(InceptionModel, self).__init__()
 
         self.input_size = input_size
         self.filters = filters
         self.depth = depth
         self.dropout = dropout
+        self.init_stride = init_stride
         
         modules = OrderedDict()
+
+        if init_stride > 0:
+            modules['init_cnn'] = torch.nn.Conv1d(kernel_size=5, 
+                                                in_channels=input_size,
+                                                out_channels=input_size,
+                                                stride=init_stride,
+                                                padding=2)
         
         for d in range(depth):
             modules[f'inception_{d}'] = Inception(
@@ -135,6 +154,8 @@ class InceptionModel(torch.nn.Module):
         self.model = torch.nn.Sequential(modules)
 
     def forward(self, x):
+        if self.init_stride > 0:
+            x = self.model.get_submodule('init_cnn')(x) # initial downsampling
         for d in range(self.depth):
             y = self.model.get_submodule(f'inception_{d}')(x if d == 0 else y)
             y = self.model.get_submodule('dropout')(y) # in general ppl tend to do CNNs > BN > activation > dropout.. and repeat

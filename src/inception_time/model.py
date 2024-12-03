@@ -9,6 +9,7 @@ class InceptionTime():
     def __init__(self,
                  filters=32,
                  depth=6,
+                 init_stride=-1,
                  n_models=5,
                  learning_rate= 0.0001,
                  batch_size=32,
@@ -45,6 +46,10 @@ class InceptionTime():
         depth: int.
             The number of blocks of each model.
         
+        init_stride: int
+            The stride of an initial CNN layer. The purpose is to have an initial downsampling. 
+            If None, no downsampling is applied before the inception blocks
+        
         models: int.
             The number of models.
         '''
@@ -58,6 +63,7 @@ class InceptionTime():
         self.l2_penalty = l2_penalty
         self.verbose = verbose
         self.filters = filters
+        self.init_stride = init_stride
         self.depth = depth
         self.n_models = n_models
         self.train_loss = [[] for i in range(n_models)]
@@ -74,7 +80,8 @@ class InceptionTime():
                 input_size=1, # channels
                 filters=self.filters,
                 depth=self.depth,
-                dropout=self.dropout
+                dropout=self.dropout,
+                init_stride=self.init_stride
             ).to(self.device) for _ in range(self.n_models)
         ]
 
@@ -296,19 +303,25 @@ class InceptionTime():
                 'learning_rate': self.learning_rate,
                 'batch_size': self.batch_size,
                 'epochs': self.epochs,
+                'dropout': self.dropout,
+                'l2_penalty': self.l2_penalty,
                 'verbose': self.verbose,
                 'filters':  self.filters,
+                'init_stride': self.init_stride,
                 'depth': self.depth,
                 'n_models': self.n_models
                 }
-    
+
     def set_params(self, params):
         self.device = params["device"]
         self.learning_rate = params["learning_rate"]
+        self.dropout = params["dropout"]
+        self.l2_penalty = params["l2_penalty"]
         self.batch_size = params["batch_size"]
         self.epochs = params["epochs"]
         self.verbose = params["verbose"]
         self.filters = params["filters"]
+        self.init_stride = params["init_stride"]
         self.depth = params["depth"]
         self.n_models = params["n_models"]
 
@@ -320,14 +333,14 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import numpy as np
 
-    dataset = 'simulated_data/DS_80_10_10'
+    dataset = 'simulated_data/DS_80_30_10'
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 5, epochs=3)
+    model = InceptionTime(n_models = 3, epochs=70, init_stride=2, depth=9, dropout=0.2)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred, y_individual = model.predict(X_test)
