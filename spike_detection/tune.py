@@ -23,6 +23,7 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate_list', type=float, nargs='*', default=[0.0001, 0.001],help='learning rate in InceptionTime')
     parser.add_argument('--dropout_list', type=float, nargs='*', default=[0.2, 0.5, 0.8], help='portion of weights to forget in InceptionTime')
     parser.add_argument('--l2_penalty_list', type=float, nargs='*', default=[0.0001, 0.001], help='l2 penalty in InceptionTime')
+    parser.add_argument('--init_stride_list', type=int, nargs='*', default=[-1, 2], help='stride of initial cnn. If zero or less, no initial cnn is applied')
     args = parser.parse_args()
 
     if args.dataset_idx is not None:
@@ -47,7 +48,8 @@ if __name__ == "__main__":
             # choose comb
             hp_comb =  {"learning_rate": choice(args.learning_rate_list), 
                         "dropout": choice(args.dropout_list),
-                        "l2_penalty": choice(args.l2_penalty_list)}
+                        "l2_penalty": choice(args.l2_penalty_list),
+                        "init_stride": choice(args.init_stride_list)}
             if hp_comb in hp_combs:
                 continue
 
@@ -58,11 +60,13 @@ if __name__ == "__main__":
             hp_combs.append(hp_comb)
 
     elif args.hp_tune_type == 'grid':
-        for learning_rate in args.learning_rate:
+        for learning_rate in args.learning_rate_list:
             for dropout in args.dropout_list:
-                for l2_penalty in args.l2_penalty:
-                    model = InceptionTime(verbose=args.verbose, n_models=args.n_models, epochs=args.n_epochs, learning_rate=learning_rate, dropout=dropout, l2_penalty=l2_penalty)
-                    train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
+                for l2_penalty in args.l2_penalty_list:
+                    for init_stride in args.init_stride_list:
+                        model = InceptionTime(verbose=args.verbose, n_models=args.n_models, epochs=args.n_epochs, 
+                                              learning_rate=learning_rate, dropout=dropout, l2_penalty=l2_penalty, init_stride=init_stride)
+                        train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
     else:
         print("Unknown hp_tune_type. Choose")
 
