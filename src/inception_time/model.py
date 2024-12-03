@@ -340,11 +340,10 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 2, epochs=3, init_stride=2, depth=9, dropout=0.2)
+    model = InceptionTime(n_models = 3, epochs=70, init_stride=2, depth=9, dropout=0.2)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred, y_individual = model.predict(X_test)
-    print(y_pred)
     print(root_mean_squared_error(y_test, y_pred))
     
 
