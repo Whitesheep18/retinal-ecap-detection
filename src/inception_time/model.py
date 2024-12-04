@@ -197,7 +197,7 @@ class InceptionTime():
                         self.valid_loss[m].append(avg_val_loss)
                         epoch += 1
 
-                        if epoch < 10:
+                        if epoch > 10:
                             # Early stopping logic
                             if avg_val_loss < best_val_loss:
                                 best_val_loss = avg_val_loss
