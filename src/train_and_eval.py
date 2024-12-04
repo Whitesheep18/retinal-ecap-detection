@@ -9,7 +9,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=''):
 
-    classifier = RandomForestClassifier()
+    classifier = RandomForestClassifier(random_state=0)
     model_name = model.__class__.__name__
 
     X = np.load(os.path.join(dataset, "X.npy"))
@@ -71,7 +71,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         writer = csv.writer(f)
         
         if not file_exists:
-            writer.writerow(["Date", "Model", "RMSE", "Accuracy", "R2", "Dataset", "SNR", "ME", "y_pred", "y_test", "comment", "params"])
+            writer.writerow(["Date", "Model", "RMSE", "Accuracy", "R2", "Dataset", "White SNR", "ME SNR", "y_pred", "y_test", "comment", "params"])
         
         y_pred = ', '.join(map(str, y_pred))
         y_test = ', '.join(map(str, y_reg_class1_test))
