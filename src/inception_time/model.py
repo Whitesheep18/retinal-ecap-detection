@@ -176,9 +176,9 @@ class InceptionTime():
                     running_loss += loss.item()
 
                     # Report
-                    if step % 10 ==0 and self.verbose:
+                    if step % 10 == 0 and self.verbose:
                         loss = loss.detach().cpu()
-                        pbar.set_description(f"epoch={epoch+1}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}, valid_loss={avg_val_loss:.1f}")
+                        pbar.set_description(f"epoch={epoch+1:3}, step={step:4}, current_loss={loss:7.1f}, epoch_loss={epoch_loss:7.1f}, valid_loss={avg_val_loss:7.1f}")
 
                     if (step+1) % len(train_dataset) == 0:
                         epoch_loss = running_loss/len(train_dataset)
@@ -337,10 +337,13 @@ if __name__ == '__main__':
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
+    X = X[y > 5]
+    y = y[y > 5]
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 3, epochs=70, init_stride=2, depth=9, dropout=0.2)
+    model = InceptionTime(n_models = 3, epochs=70, init_stride=3, dropout=0)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred, y_individual = model.predict(X_test)
