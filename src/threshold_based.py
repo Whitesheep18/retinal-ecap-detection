@@ -48,6 +48,10 @@ class ThresholdBased():
         return {"noise_factor": self.noise_factor,
                 "noise_method": self.noise_method,
                 "patience"    : self.patience}
+    
+    def __repr__(self):
+        params = ', '.join([f"{k}={v}" for k, v in self.get_params().items()])
+        return f"ThresholdBased({params})"
 
             
 
@@ -60,7 +64,8 @@ if __name__ == '__main__':
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
-    model = TresholdBased()
+    model = ThresholdBased()
+    print(model)
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     y_pred = model.predict(X_test)

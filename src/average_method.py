@@ -9,3 +9,12 @@ class AveragePredictionModel:
     
     def get_params(self):
         return {}
+    
+    def __repr__(self):
+        return f"AveragePredictionModel()"
+
+
+if __name__=='__main__':
+    model = AveragePredictionModel()
+    print(model)
+
