@@ -23,6 +23,7 @@ module load python3/3.10.12
 python -m venv ../irishcream
 source ../irishcream/bin/activate
 pip install -r requirements.txt
+pip install -e .
 ```
 
 Create all datasets:
