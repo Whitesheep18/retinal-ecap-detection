@@ -119,10 +119,10 @@ if __name__ == "__main__":
 
     # Define the parameters
     N = 4000 # total dataset size
-    num_cells_list = [0, 50]
+    num_cells_list = [0, 30, 50, 70]
     ME_SNR_dB_list = [ME_snr_value]
     spontaneous_firing_Hz_list = [spontaneous_firing_Hz_value]
-    AP_amplitude_std_pct_list = [1, 10]
+    AP_amplitude_std_pct_list = [1]
     num_comb = len(num_cells_list) * len(ME_SNR_dB_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
     num_samples_per_comb = N//(num_comb)
 
