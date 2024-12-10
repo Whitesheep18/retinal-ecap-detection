@@ -130,11 +130,18 @@ class InceptionModel(torch.nn.Module):
         modules = OrderedDict()
 
         if init_stride > 0:
-            modules['init_cnn'] = torch.nn.Conv1d(kernel_size=5, 
-                                                in_channels=input_size,
-                                                out_channels=input_size,
-                                                stride=init_stride,
-                                                padding=2)
+            modules['init_cnn'] = torch.nn.Sequential(
+                torch.nn.Conv1d(kernel_size=3, 
+                                 in_channels=input_size,
+                                out_channels=16,
+                                stride=init_stride,
+                                padding=1),
+                torch.nn.Conv1d(kernel_size=3,
+                                in_channels=16, 
+                                out_channels=1,
+                                stride=1,
+                                padding=1)
+                )
         
         for d in range(depth):
             modules[f'inception_{d}'] = Inception(
