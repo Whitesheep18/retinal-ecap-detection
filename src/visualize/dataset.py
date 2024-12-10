@@ -2,8 +2,10 @@ import matplotlib.pyplot as plt
 import os
 from datetime import datetime
 import numpy as np
+from utils import setup_plotting_environment, save_figure
 
 def plot_single_sample(dataset, idx):
+    setup_plotting_environment()
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
@@ -13,14 +15,11 @@ def plot_single_sample(dataset, idx):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     dataset_name = dataset.split('/')[-1]
     filename = f'{dataset_name}_sample_{idx}_{timestamp}.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-    plt.savefig(filepath)
-    plt.close()  
+    save_figure(name=filename, figdir='./plots')
 
 
 def plot_random_sample(dataset, num_samples):
+    setup_plotting_environment()
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
@@ -40,15 +39,10 @@ def plot_random_sample(dataset, num_samples):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     dataset_name = dataset.split('/')[-1]
     filename = f'{dataset_name}_{timestamp}.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-
-    plt.title(f'{num_samples} samples from {dataset_name}')
-    plt.savefig(filepath)
-    plt.close()
+    save_figure(name=filename, figdir='./plots')
 
 def plot_ds_overview(path_to_datasets, num_samples):
+    setup_plotting_environment()
 
     datasets = [x for x in os.listdir(path_to_datasets) if x.startswith('DS')]
     dataset_idx = 0
@@ -85,17 +79,13 @@ def plot_ds_overview(path_to_datasets, num_samples):
 
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'datasets_{timestamp}.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-    plt.tight_layout()
-    plt.savefig(filepath)
-    plt.close()
+    save_figure(name=filename, figdir='./plots')
 
 
 def plot_target_value_distribution(path_to_datasets):
     from src.utils import sorting_key
     import seaborn as sns
+    setup_plotting_environment()
 
     datasets = [x for x in os.listdir(path_to_datasets) if x.startswith('DS')]
     datasets = sorted(datasets, key=sorting_key)
@@ -109,15 +99,7 @@ def plot_target_value_distribution(path_to_datasets):
     plt.legend()
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'target_dists_{timestamp}.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-    plt.tight_layout()
-    plt.savefig(filepath)
-    plt.close()
-
-
-
+    save_figure(name=filename, figdir='./plots')
 
 
 

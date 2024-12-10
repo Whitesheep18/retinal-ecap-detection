@@ -190,6 +190,7 @@ class RecordingGenerator():
     
 if __name__ == "__main__":
     import os
+    from utils import setup_plotting_environment, save_figure
     np.random.seed(42)
                 
     rec = RecordingGenerator(
@@ -211,24 +212,20 @@ if __name__ == "__main__":
     me_noise = rec.create_mains_electricity_noise(data, SNR_dB=30)
     noised_data = data + white_noise + me_noise
 
-    os.makedirs('./plots/simulated_data', exist_ok=True) 
-
+    setup_plotting_environment()
     plt.plot(noised_data, label='noised_data')
     plt.plot(data, label='data', color='orange')
     plt.legend()
-    plt.savefig('./plots/simulated_data/noised_data.png')
-    plt.close()
+    save_figure(name=f'noised_data', figdir='./plots/simulated_data')
 
     plt.scatter(np.arange(len(data)), data, color=['olive' if x else 'pink' for x in is_spike], s=3)
     plt.title('Data without noise, spiked index marked green')
-    plt.savefig('./plots/simulated_data/is_spike.png')
-    plt.close()
+    save_figure(name=f'is_spike', figdir='./plots/simulated_data')
 
 
     plt.plot(amount_spike)
     plt.title('Amount of spikes present at an index')
-    plt.savefig('./plots/simulated_data/amount_spike.png')
-    plt.close()
+    save_figure(name=f'amount_spike', figdir='./plots/simulated_data')
 
     # order APs and AP_indexes by start index in AP_indexes
 
@@ -270,9 +267,7 @@ if __name__ == "__main__":
     axs[0].set_title('Spike')
     axs[1].set_ylim(-800, 800)
     axs[1].set_title('Not spike')
-    plt.savefig('./plots/simulated_data/spike_not_spike.png')
-    plt.close()
-
+    save_figure(name=f'spike_not_spike', figdir='./plots/simulated_data')
 
     np.save('X.npy', X)
     np.save('y_class.npy', y_class)
@@ -281,7 +276,6 @@ if __name__ == "__main__":
     plt.plot(y_reg)
     plt.xlabel('Window id')
     plt.ylabel('Num. fully contained spikes')
-    plt.savefig('./plots/simulated_data/reg.png')
-    plt.close()
+    save_figure(name=f'reg', figdir='./plots/simulated_data')
 
             

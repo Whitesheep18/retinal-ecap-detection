@@ -2,6 +2,7 @@ import numpy as np
 import neo
 import os
 import re
+import matplotlib.pyplot as plt
 
 def get_signal(filepath='../data/10Hz_1V_neg500mV_1ms003.ns5', verbose=1):
     reader = neo.io.BlackrockIO(filename=filepath)
@@ -50,3 +51,39 @@ def sorting_key(dataset_name):
         me = int(match.group(2))
         return (snr, me)  
     return (float('inf'), float('inf'))
+
+
+def setup_plotting_environment():
+    """
+    Sets up matplotlib rcParams for consistent figure styling.
+    """
+    fs = 10  # font size
+    rcParams = {
+        "font.family": "sans-serif",  
+        'text.usetex': True,     
+        'font.size': fs,
+        'axes.labelsize': fs,
+        'axes.titlesize': fs,
+        'xtick.labelsize': fs,
+        'ytick.labelsize': fs,
+        'legend.fontsize': fs,
+        'axes.labelpad': 1,
+        'axes.axisbelow': True,
+        "pgf.rcfonts": False, 
+        "pgf.preamble": "\n".join([
+            r"\usepackage{url}", 
+            r"\usepackage{amsmath,amssymb}",
+        ])
+    }
+    plt.rcParams.update(rcParams)
+
+def save_figure(name, figdir=None, width=6, height=4):
+    if figdir is None:
+        figdir = './figures'
+    if not os.path.exists(figdir):
+        os.makedirs(figdir)  # Ensure the directory exists
+
+    filepath = os.path.join(figdir, f"{name}.png")
+    plt.gcf().set_size_inches(width, height)
+    plt.savefig(filepath, bbox_inches='tight')
+    plt.close()
