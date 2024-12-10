@@ -46,6 +46,8 @@ class RecordingGenerator():
         self.SA_length = self.SA_templates.shape[1]
         self.AP_length = self.AP_templates.shape[1]
 
+        self.tol_dB = 0.5 # for checking if correct level of SNR is applied
+
     def _set_template(self, template):
         if isinstance(template, str):
             return np.load(template)
@@ -142,8 +144,14 @@ class RecordingGenerator():
         Creates white noise according to the data and a given SNR in dB
         """
         signal_power = np.mean(data**2)
-        noise_power = signal_power / 10**(SNR_dB/10)
+        noise_power = signal_power / 10**(SNR_dB/10) 
         noise = np.random.normal(0, np.sqrt(noise_power), len(data))
+
+        actual_SNR_dB = 10 * np.log10(signal_power / np.mean(noise**2))
+        assert np.abs(actual_SNR_dB - SNR_dB) < self.tol_dB, \
+            f"Generated noise does not match the desired SNR. Actual: {actual_SNR_dB:.2f} dB, Expected: {SNR_dB} dB."
+
+
         return noise
     
     def create_mains_electricity_noise(self, data, ME_template=None, SNR_dB=10):
@@ -162,6 +170,11 @@ class RecordingGenerator():
         noise_power = np.mean(ME**2)
         scaling_factor = np.sqrt(signal_power / (noise_power*10**(SNR_dB/10)))
         ME*=scaling_factor
+
+        actual_SNR_dB = 10 * np.log10(signal_power / np.mean(ME**2))        
+        assert np.abs(actual_SNR_dB - SNR_dB) < self.tol_dB, \
+            f"Generated noise does not match the desired SNR. Actual: {actual_SNR_dB:.2f} dB, Expected: {SNR_dB} dB."
+
         return ME
     
     def add_spontaneous_spikes(self, data, firing_Hz=1, return_APs=False):
