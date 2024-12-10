@@ -28,7 +28,7 @@ folder_path = os.path.join(base_directory, folder_name)
 os.makedirs(folder_path, exist_ok=True)
 
 # Define the parameters
-N = 2000 # total dataset size
+N = 4000 # total dataset size
 num_cells_list = [0, 50]
 ME_SNR_dB_list = [ME_snr_value]
 spontaneous_firing_Hz_list = [spontaneous_firing_Hz_value]
@@ -45,7 +45,6 @@ params = {
     "ME_SNR_dB_list": ME_SNR_dB_list,
     "spontaneous_firing_Hz_list": spontaneous_firing_Hz_list,
     "AP_amplitude_std_pct_list": AP_amplitude_std_pct_list,
-    "first_AP_stim_lambda_ms": 0.2,
     "AP_length_mean_std_ms": [5, 1],
     "SA_amplitude_mean_std_pct": [1, 0.1],
     "spike_train_start_lambda_ms": 1,

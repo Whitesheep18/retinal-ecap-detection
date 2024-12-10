@@ -7,7 +7,6 @@ from src.utils import get_template
 
 class RecordingGenerator():
     def __init__(self, 
-                 first_AP_stim_lambda_ms = 1, # Exponential
                  AP_length_mean_std_ms = [2, 0.1], # Gaussian
                  AP_amplitude_mean_std_pct = [1, 1], # Gaussian
                  SA_amplitude_mean_std_pct = [1, 0.1], # Gaussian
@@ -22,7 +21,6 @@ class RecordingGenerator():
                  AP_templates = None,
                  ME_template  = None
                  ):
-        self.first_AP_stim_lambda_ms = first_AP_stim_lambda_ms
         self.AP_length_mean_std_ms = AP_length_mean_std_ms
         self.AP_amplitude_mean_std_pct = AP_amplitude_mean_std_pct
         self.SA_amplitude_mean_std_pct = SA_amplitude_mean_std_pct
@@ -193,7 +191,6 @@ if __name__ == "__main__":
     np.random.seed(42)
                 
     rec = RecordingGenerator(
-        first_AP_stim_lambda_ms = 0.2,
         AP_length_mean_std_ms = [5, 1],
         AP_amplitude_mean_std_pct = [1, 20],
         SA_amplitude_mean_std_pct = [1, 0.1],

@@ -28,7 +28,6 @@ def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size
 
 def make_dataset_stim(
     n=20,
-    first_AP_stim_lambda_ms=0.2,
     AP_length_mean_std_ms=[5, 1],
     AP_amplitude_std_pct_list=[1],  # List of amplitude mean values
     SA_amplitude_mean_std_pct=[1, 0.1],
@@ -56,7 +55,6 @@ def make_dataset_stim(
 
 
                         rec_cells = RecordingGenerator(
-                            first_AP_stim_lambda_ms=first_AP_stim_lambda_ms,
                             AP_length_mean_std_ms=AP_length_mean_std_ms,
                             AP_amplitude_mean_std_pct=AP_amplitude_mean_std_pct,
                             SA_amplitude_mean_std_pct=SA_amplitude_mean_std_pct,
