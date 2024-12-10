@@ -6,6 +6,7 @@ import pandas as pd
 import ast
 
 def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
+    from utils import save_figure
     # Load the CSV file
     data = pd.read_csv(csv_file_path)
 
@@ -29,14 +30,11 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'snr_rms_plot_{timestamp}.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-    plt.savefig(filepath)
-    plt.close()  
+    save_figure(name=filename, figdir='./plots')    
 
 
 def pred_test_plot(csv_file_path, model_name, me_level=None):
+    from utils import save_figure
     data = pd.read_csv(csv_file_path)
     
     filtered_data = data[data['Model'] == model_name]
@@ -69,14 +67,11 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
     plt.legend(title='White SNR levels')
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'{model_name}_y_test_y_pred_plot_{timestamp}.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-    plt.savefig(filepath)
-    plt.close()
+    save_figure(name=filename, figdir='./plots')
 
 
 def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
+    from utils import save_figure
     data = pd.read_csv(csv_file_path)
     filtered_data = data[(data['Model'] == model_name) & (data['White SNR'] == snr_value)]
     if me_level is not None:
@@ -102,14 +97,11 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'{model_name}_residual_plot_{snr_value}_{timestamp}.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-    plt.savefig(filepath)
-    plt.close()
+    save_figure(name=filename, figdir='./plots')
 
 
 def residual_plot_individual(y_individual, y_test):
+    from utils import save_figure
         # Ensure y_test is a 1D array.
     y_test = np.asarray(y_test).flatten()
 
@@ -149,11 +141,7 @@ def residual_plot_individual(y_individual, y_test):
 
     # Save the plot to file
     filename = 'res.png'
-    if not os.path.exists('./plots'):
-        os.mkdir('./plots')
-    filepath = os.path.join('./plots', filename)
-    plt.savefig(filepath)
-    plt.close()
+    save_figure(name=filename, figdir='./plots')
 
 
 
@@ -161,5 +149,5 @@ def residual_plot_individual(y_individual, y_test):
 
 
 #RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
-pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=30)
+#pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=30)
 #residual_plot('spike_detection/results.csv', 'DrCIFRegressor', 80, me_level=30)
