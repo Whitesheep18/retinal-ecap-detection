@@ -54,7 +54,7 @@ if __name__ == "__main__":
         elif model == "DrCIFRegressor":        
             from aeon.regression.interval_based import DrCIFRegressor
             model = DrCIFRegressor(n_estimators=10, min_interval_length= 100, random_state=0)
-        elif model == "InceptionNet":
+        elif model == "InceptionTime":
             from src.inception_time.model import InceptionTime
             model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, dropout=args.dropout, l2_penalty=args.l2_penalty)
         elif model == "AveragePrediction":
