@@ -190,7 +190,7 @@ class RecordingGenerator():
     
 if __name__ == "__main__":
     import os
-    from utils import setup_plotting_environment, save_figure
+    from utils import save_figure
     np.random.seed(42)
                 
     rec = RecordingGenerator(
@@ -212,7 +212,6 @@ if __name__ == "__main__":
     me_noise = rec.create_mains_electricity_noise(data, SNR_dB=30)
     noised_data = data + white_noise + me_noise
 
-    setup_plotting_environment()
     plt.plot(noised_data, label='noised_data')
     plt.plot(data, label='data', color='orange')
     plt.legend()

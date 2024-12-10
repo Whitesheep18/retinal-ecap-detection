@@ -53,29 +53,26 @@ def sorting_key(dataset_name):
     return (float('inf'), float('inf'))
 
 
-def setup_plotting_environment():
-    """
-    Sets up matplotlib rcParams for consistent figure styling.
-    """
-    fs = 10  # font size
-    rcParams = {
-        "font.family": "sans-serif",  
-        'text.usetex': True,     
-        'font.size': fs,
-        'axes.labelsize': fs,
-        'axes.titlesize': fs,
-        'xtick.labelsize': fs,
-        'ytick.labelsize': fs,
-        'legend.fontsize': fs,
-        'axes.labelpad': 1,
-        'axes.axisbelow': True,
-        "pgf.rcfonts": False, 
-        "pgf.preamble": "\n".join([
-            r"\usepackage{url}", 
-            r"\usepackage{amsmath,amssymb}",
-        ])
-    }
-    plt.rcParams.update(rcParams)
+# Set up plotting enviroment
+fs = 20  # font size
+rcParams = {
+    "font.family": "sans-serif", 
+    'text.usetex': False, 
+    'font.size': fs,
+    'axes.labelsize': fs,
+    'axes.titlesize': fs,
+    'xtick.labelsize': fs,
+    'ytick.labelsize': fs,
+    'legend.fontsize': fs,
+    'axes.labelpad': 1,
+    'axes.axisbelow': True,
+    "pgf.rcfonts": False, 
+    "pgf.preamble": "\n".join([
+        r"\usepackage{url}", 
+        r"\usepackage{amsmath,amssymb}",
+    ])
+}
+plt.rcParams.update(rcParams)
 
 def save_figure(name, figdir=None, width=6, height=4):
     if figdir is None:

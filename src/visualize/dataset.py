@@ -2,10 +2,9 @@ import matplotlib.pyplot as plt
 import os
 from datetime import datetime
 import numpy as np
-from utils import setup_plotting_environment, save_figure
 
 def plot_single_sample(dataset, idx):
-    setup_plotting_environment()
+    from utils import save_figure
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
@@ -19,7 +18,7 @@ def plot_single_sample(dataset, idx):
 
 
 def plot_random_sample(dataset, num_samples):
-    setup_plotting_environment()
+    from utils import save_figure
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
@@ -42,7 +41,7 @@ def plot_random_sample(dataset, num_samples):
     save_figure(name=filename, figdir='./plots')
 
 def plot_ds_overview(path_to_datasets, num_samples):
-    setup_plotting_environment()
+    from utils import save_figure
 
     datasets = [x for x in os.listdir(path_to_datasets) if x.startswith('DS')]
     dataset_idx = 0
@@ -85,7 +84,7 @@ def plot_ds_overview(path_to_datasets, num_samples):
 def plot_target_value_distribution(path_to_datasets):
     from src.utils import sorting_key
     import seaborn as sns
-    setup_plotting_environment()
+    from utils import save_figure
 
     datasets = [x for x in os.listdir(path_to_datasets) if x.startswith('DS')]
     datasets = sorted(datasets, key=sorting_key)

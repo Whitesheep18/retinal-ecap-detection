@@ -4,10 +4,9 @@ import os
 from datetime import datetime
 import pandas as pd
 import ast
-from utils import setup_plotting_environment, save_figure
 
 def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
-    setup_plotting_environment()
+    from utils import save_figure
     # Load the CSV file
     data = pd.read_csv(csv_file_path)
 
@@ -35,7 +34,7 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
 
 
 def pred_test_plot(csv_file_path, model_name, me_level=None):
-    setup_plotting_environment()
+    from utils import save_figure
     data = pd.read_csv(csv_file_path)
     
     filtered_data = data[data['Model'] == model_name]
@@ -72,7 +71,7 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
 
 
 def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
-    setup_plotting_environment()
+    from utils import save_figure
     data = pd.read_csv(csv_file_path)
     filtered_data = data[(data['Model'] == model_name) & (data['White SNR'] == snr_value)]
     if me_level is not None:
@@ -102,7 +101,7 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
 
 
 def residual_plot_individual(y_individual, y_test):
-    setup_plotting_environment()
+    from utils import save_figure
         # Ensure y_test is a 1D array.
     y_test = np.asarray(y_test).flatten()
 
