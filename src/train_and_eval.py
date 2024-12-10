@@ -50,7 +50,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     else: 
         model.fit(X_class1_train, y_reg_class1_train)
 
-    if  model_name == "AveragePredictionModel":
+    if  model_name == "AveragePrediction":
         y_pred = model.predict(y_reg_class1_train,X_class1_test)
     elif model_name == "InceptionTime":
         y_pred, y_individual = model.predict(X_class1_test)

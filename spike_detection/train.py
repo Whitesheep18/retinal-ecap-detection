@@ -48,18 +48,18 @@ if __name__ == "__main__":
         elif model == "ThresholdBased":
             from src.threshold_based import ThresholdBased
             model = ThresholdBased()
-        elif model == "FreshPRINCE":        
+        elif model == "FreshPRINCERegressor":        
             from aeon.regression.feature_based import FreshPRINCERegressor
             model = FreshPRINCERegressor(verbose=args.verbose, default_fc_parameters='efficient', n_estimators=100)
-        elif model == "DrCIF":        
+        elif model == "DrCIFRegressor":        
             from aeon.regression.interval_based import DrCIFRegressor
             model = DrCIFRegressor(n_estimators=10, min_interval_length= 100, random_state=0)
-        elif model == "InceptionNetPytorch":
+        elif model == "InceptionNet":
             from src.inception_time.model import InceptionTime
             model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, dropout=args.dropout, l2_penalty=args.l2_penalty)
-        elif model == "AverageMethod":
-            from src.average_method import AveragePredictionModel
-            model = AveragePredictionModel()
+        elif model == "AveragePrediction":
+            from src.average_method import AveragePrediction
+            model = AveragePrediction()
         else:
             print(f"Unknown model {model}")
             sys.exit(1)
