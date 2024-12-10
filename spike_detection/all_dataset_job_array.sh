@@ -15,4 +15,4 @@ source ../irishcream/bin/activate
 
 python src/generate_datasets.py $LSB_JOBINDEX 
 
-# run with: bsub < src/all_dataset_job_array.sh
+# run with: bsub < spike_detection/all_dataset_job_array.sh
