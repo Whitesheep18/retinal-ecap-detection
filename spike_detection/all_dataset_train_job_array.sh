@@ -1,7 +1,7 @@
 #!/bin/bash
-#BSUB -J train[1-6]
+#BSUB -J train[2,4,6,8,10,12]
 #BSUB -q gpuv100
-#BSUB -W 10:00
+#BSUB -W 5:00
 #BSUB -n 5
 #BSUB -R "span[hosts=1]"
 #BSUB -R "rusage[mem=16GB]"
@@ -12,7 +12,7 @@
 # Initialize Python environment
 source ../irishcream/bin/activate
 
-python spike_detection/train.py --models ThresholdBased --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
+python spike_detection/train.py --models AverageMethod LinearRegression ThresholdBased DrCIF InceptionNetPytorch --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
 #python spike_detection/train.py --models LinearRegression ThresholdBased FreshPRINCE DrCIF InceptionNet --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
 
 

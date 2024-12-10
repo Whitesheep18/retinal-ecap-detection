@@ -139,18 +139,18 @@ class RecordingGenerator():
 
         return SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spikes, data
     
-    def add_white_noise(self, data, SNR_dB=10):
+    def create_white_noise(self, data, SNR_dB=10):
         """
-        Adds white noise to the data with a given SNR in dB
+        Creates white noise according to the data and a given SNR in dB
         """
         signal_power = np.mean(data**2)
         noise_power = signal_power / 10**(SNR_dB/10)
         noise = np.random.normal(0, np.sqrt(noise_power), len(data))
-        return data + noise
+        return noise
     
-    def add_mains_electricity_noise(self, data, ME_template=None, amplitude_scaler=1):
+    def create_mains_electricity_noise(self, data, ME_template=None, SNR_dB=10):
         """
-        Adds mains electricity noise to the data
+        Creates mains electricity noise according to the data and a given SNR in dB
         """
 
         if ME_template is None:
@@ -158,10 +158,13 @@ class RecordingGenerator():
         ME = np.tile(ME_template.flatten(), len(data)//len(ME_template) + 1)
         ME = np.roll(ME, np.random.randint(len(ME))) # random phase
         ME = ME[:len(data)]
-        ME *= amplitude_scaler
         ME, _ = self.interp_template(ME, len(ME)/self.fs*1000) # jitter
-        
-        return data + ME
+
+        signal_power = np.mean(data**2)
+        noise_power = np.mean(ME**2)
+        scaling_factor = np.sqrt(signal_power / (noise_power*10**(SNR_dB/10)))
+        ME*=scaling_factor
+        return ME
     
     def add_spontaneous_spikes(self, data, firing_Hz=1, return_APs=False):
         """
@@ -186,6 +189,8 @@ class RecordingGenerator():
         return data
     
 if __name__ == "__main__":
+    import os
+    np.random.seed(42)
                 
     rec = RecordingGenerator(
         first_AP_stim_lambda_ms = 0.2,
@@ -202,21 +207,28 @@ if __name__ == "__main__":
         )
     
     SAs, SA_indexes, APs, AP_indexes, is_spike, amount_spike, data = rec.generate(2, verbose=0)
-    noised_data = rec.add_white_noise(data, SNR_dB=10)
-    noised_data = rec.add_mains_electricity_noise(noised_data, amplitude_scaler=1)
+    white_noise = rec.create_white_noise(data, SNR_dB=80)
+    me_noise = rec.create_mains_electricity_noise(data, SNR_dB=30)
+    noised_data = data + white_noise + me_noise
+
+    os.makedirs('./plots/simulated_data', exist_ok=True) 
 
     plt.plot(noised_data, label='noised_data')
     plt.plot(data, label='data', color='orange')
     plt.legend()
-    plt.show()
+    plt.savefig('./plots/simulated_data/noised_data.png')
+    plt.close()
 
     plt.scatter(np.arange(len(data)), data, color=['olive' if x else 'pink' for x in is_spike], s=3)
     plt.title('Data without noise, spiked index marked green')
-    plt.show()
+    plt.savefig('./plots/simulated_data/is_spike.png')
+    plt.close()
+
 
     plt.plot(amount_spike)
     plt.title('Amount of spikes present at an index')
-    plt.show()
+    plt.savefig('./plots/simulated_data/amount_spike.png')
+    plt.close()
 
     # order APs and AP_indexes by start index in AP_indexes
 
@@ -228,7 +240,7 @@ if __name__ == "__main__":
 
     SA_size = len(SA_indexes[0])
     num_samples = 300
-    window_size = 200
+    window_size = 200 # set this to 2700 to capture the entire response
     window_offset = 50
     X, y_class, y_reg = np.zeros((num_samples, window_size)), np.zeros(num_samples), np.zeros(num_samples)
     i = 0
@@ -258,7 +270,9 @@ if __name__ == "__main__":
     axs[0].set_title('Spike')
     axs[1].set_ylim(-800, 800)
     axs[1].set_title('Not spike')
-    plt.show()
+    plt.savefig('./plots/simulated_data/spike_not_spike.png')
+    plt.close()
+
 
     np.save('X.npy', X)
     np.save('y_class.npy', y_class)
@@ -267,6 +281,7 @@ if __name__ == "__main__":
     plt.plot(y_reg)
     plt.xlabel('Window id')
     plt.ylabel('Num. fully contained spikes')
-    plt.show()
-        
+    plt.savefig('./plots/simulated_data/reg.png')
+    plt.close()
+
             
