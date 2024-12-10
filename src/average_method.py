@@ -1,4 +1,4 @@
-class AveragePredictionModel:
+class AveragePrediction:
     def fit(self, x_train, y_train):
         "no training required. this is an unsupervised method."
         pass
@@ -11,10 +11,10 @@ class AveragePredictionModel:
         return {}
     
     def __repr__(self):
-        return f"AveragePredictionModel()"
+        return f"AveragePrediction()"
 
 
 if __name__=='__main__':
-    model = AveragePredictionModel()
+    model = AveragePrediction()
     print(model)
 
