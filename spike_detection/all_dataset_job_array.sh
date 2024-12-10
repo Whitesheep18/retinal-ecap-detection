@@ -13,6 +13,6 @@
 # Initialize Python environment
 source ../irishcream/bin/activate
 
-python spike_detection/generate_datasets.py $LSB_JOBINDEX 
+python src/generate_datasets.py $LSB_JOBINDEX 
 
 # run with: bsub < spike_detection/all_dataset_job_array.sh

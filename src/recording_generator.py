@@ -7,7 +7,6 @@ from src.utils import get_template
 
 class RecordingGenerator():
     def __init__(self, 
-                 first_AP_stim_lambda_ms = 1, # Exponential
                  AP_length_mean_std_ms = [2, 0.1], # Gaussian
                  AP_amplitude_mean_std_pct = [1, 1], # Gaussian
                  SA_amplitude_mean_std_pct = [1, 0.1], # Gaussian
@@ -22,7 +21,6 @@ class RecordingGenerator():
                  AP_templates = None,
                  ME_template  = None
                  ):
-        self.first_AP_stim_lambda_ms = first_AP_stim_lambda_ms
         self.AP_length_mean_std_ms = AP_length_mean_std_ms
         self.AP_amplitude_mean_std_pct = AP_amplitude_mean_std_pct
         self.SA_amplitude_mean_std_pct = SA_amplitude_mean_std_pct
@@ -47,6 +45,8 @@ class RecordingGenerator():
         
         self.SA_length = self.SA_templates.shape[1]
         self.AP_length = self.AP_templates.shape[1]
+
+        self.tol_dB = 0.5 # for checking if correct level of SNR is applied
 
     def _set_template(self, template):
         if isinstance(template, str):
@@ -144,8 +144,14 @@ class RecordingGenerator():
         Creates white noise according to the data and a given SNR in dB
         """
         signal_power = np.mean(data**2)
-        noise_power = signal_power / 10**(SNR_dB/10)
+        noise_power = signal_power / 10**(SNR_dB/10) 
         noise = np.random.normal(0, np.sqrt(noise_power), len(data))
+
+        actual_SNR_dB = 10 * np.log10(signal_power / np.mean(noise**2))
+        assert np.abs(actual_SNR_dB - SNR_dB) < self.tol_dB, \
+            f"Generated noise does not match the desired SNR. Actual: {actual_SNR_dB:.2f} dB, Expected: {SNR_dB} dB."
+
+
         return noise
     
     def create_mains_electricity_noise(self, data, ME_template=None, SNR_dB=10):
@@ -164,6 +170,11 @@ class RecordingGenerator():
         noise_power = np.mean(ME**2)
         scaling_factor = np.sqrt(signal_power / (noise_power*10**(SNR_dB/10)))
         ME*=scaling_factor
+
+        actual_SNR_dB = 10 * np.log10(signal_power / np.mean(ME**2))        
+        assert np.abs(actual_SNR_dB - SNR_dB) < self.tol_dB, \
+            f"Generated noise does not match the desired SNR. Actual: {actual_SNR_dB:.2f} dB, Expected: {SNR_dB} dB."
+
         return ME
     
     def add_spontaneous_spikes(self, data, firing_Hz=1, return_APs=False):
@@ -194,7 +205,6 @@ if __name__ == "__main__":
     np.random.seed(42)
                 
     rec = RecordingGenerator(
-        first_AP_stim_lambda_ms = 0.2,
         AP_length_mean_std_ms = [5, 1],
         AP_amplitude_mean_std_pct = [1, 20],
         SA_amplitude_mean_std_pct = [1, 0.1],

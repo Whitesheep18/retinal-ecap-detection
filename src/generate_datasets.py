@@ -1,4 +1,7 @@
+import os
 import numpy as np
+import json
+import sys
 from src.recording_generator import RecordingGenerator
 np.random.seed(42)
 
@@ -28,7 +31,6 @@ def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size
 
 def make_dataset_stim(
     n=20,
-    first_AP_stim_lambda_ms=0.2,
     AP_length_mean_std_ms=[5, 1],
     AP_amplitude_std_pct_list=[1],  # List of amplitude mean values
     SA_amplitude_mean_std_pct=[1, 0.1],
@@ -56,7 +58,6 @@ def make_dataset_stim(
 
 
                         rec_cells = RecordingGenerator(
-                            first_AP_stim_lambda_ms=first_AP_stim_lambda_ms,
                             AP_length_mean_std_ms=AP_length_mean_std_ms,
                             AP_amplitude_mean_std_pct=AP_amplitude_mean_std_pct,
                             SA_amplitude_mean_std_pct=SA_amplitude_mean_std_pct,
@@ -88,8 +89,71 @@ def make_dataset_stim(
 
     return X, y_reg
 
+
 if __name__ == "__main__":
-    X, y_reg = make_dataset_stim(num_cells_list=[0, 50], white_SNR_dB_list=[10,20,50],   
-                                ME_SNR_dB_list=[10, 50], spontaneous_firing_Hz_list=[100,1000],   
-                                AP_amplitude_std_pct_list=[1, 10, 20])
+    if len(sys.argv) != 2:
+        raise Exception("Provide dataset idx. Usage python generate_datasets.py <IDX>")
     
+    idx = int(sys.argv[1])
+
+    white_snr_range = [-10,0,10,20,50,80]
+    ME_snr_range = [10, 30]
+
+    white_snr_idx = (idx-1)%len(white_snr_range)
+    ME_snr_idx = (idx-1)//len(white_snr_range)
+
+    white_snr_value = white_snr_range[white_snr_idx]
+    ME_snr_value = ME_snr_range[ME_snr_idx]
+
+    print(f"IDX: {idx}")
+    print(f"SNR: idx {white_snr_idx}, value {white_snr_value}")
+    print(f"ME: idx {ME_snr_idx}, value {ME_snr_value}")
+
+    spontaneous_firing_Hz_value = 10
+    folder_name = f"DS_{white_snr_value}_{ME_snr_value}_{spontaneous_firing_Hz_value}"
+
+    # Define the base directory for saving data
+    base_directory = 'simulated_data'
+    folder_path = os.path.join(base_directory, folder_name)
+    os.makedirs(folder_path, exist_ok=True)
+
+    # Define the parameters
+    N = 4000 # total dataset size
+    num_cells_list = [0, 30, 50, 70]
+    ME_SNR_dB_list = [ME_snr_value]
+    spontaneous_firing_Hz_list = [spontaneous_firing_Hz_value]
+    AP_amplitude_std_pct_list = [1]
+    num_comb = len(num_cells_list) * len(ME_SNR_dB_list) * len(spontaneous_firing_Hz_list) * len(AP_amplitude_std_pct_list)
+    num_samples_per_comb = N//(num_comb)
+
+    print(f'Generating {num_samples_per_comb} samples per comb, ie. {num_samples_per_comb*num_comb} samples in total - close to {N}')
+
+    params = {
+        "n": num_samples_per_comb,
+        "num_cells_list": num_cells_list,
+        "white_SNR_dB_list": [white_snr_value], # len is no datasets
+        "ME_SNR_dB_list": ME_SNR_dB_list,
+        "spontaneous_firing_Hz_list": spontaneous_firing_Hz_list,
+        "AP_amplitude_std_pct_list": AP_amplitude_std_pct_list,
+        "AP_length_mean_std_ms": [5, 1],
+        "SA_amplitude_mean_std_pct": [1, 0.1],
+        "spike_train_start_lambda_ms": 1,
+        "spike_train_rate_lambda": 1,
+        "inter_spike_train_interval_lambda_ms": 5,
+        "CAP_jitter_mean_std_ms": [1, 0.1],
+        "template_jitter_ms": 1,
+        "window_size": 2700,
+    }
+
+    # Save parameters to a JSON file
+    with open(os.path.join(folder_path, 'params.json'), 'w') as params_file:
+        json.dump(params, params_file, indent=4)
+
+    # Generate the dataset
+    np.random.seed(42)
+    X, y_reg = make_dataset_stim(**params)
+
+    # Save X and y_reg to files
+    np.save(os.path.join(folder_path, 'X.npy'), X)
+    np.save(os.path.join(folder_path, 'y_reg.npy'), y_reg)
+
