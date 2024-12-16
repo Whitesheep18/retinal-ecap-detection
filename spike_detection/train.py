@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate in InceptionTime (original and ours)')
     parser.add_argument('--dropout', type=float, default=0, help='portion of weights to forget in InceptionTime (ours)')
     parser.add_argument('--l2_penalty', type=float, default=0, help='l2 penalty in InceptionTime (ours)')
+    parser.add_argument('--init_stride', type=int, default=-1, help='rate of initial downsampling CNN in InceptionTime (ours big time)')
     args = parser.parse_args()
 
     if args.dataset_idx is not None:
@@ -49,7 +50,8 @@ if __name__ == "__main__":
             model = DrCIFRegressor(n_estimators=10, min_interval_length= 100, random_state=0)
         elif model == "InceptionTime":
             from src.inception_time.model import InceptionTime
-            model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, dropout=args.dropout, l2_penalty=args.l2_penalty)
+            model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, 
+                                  dropout=args.dropout, l2_penalty=args.l2_penalty, init_stride=args.init_stride)
         elif model == "AveragePrediction":
             from src.average_method import AveragePrediction
             model = AveragePrediction()
