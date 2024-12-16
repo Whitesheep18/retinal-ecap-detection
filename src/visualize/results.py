@@ -16,7 +16,7 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
         model_data = data[data['Model'] == model]
         if me_level is not None:
             model_data = model_data[model_data['ME SNR'] == me_level]
-        plt.scatter(model_data['White SNR'], model_data['RMSE'], label=model, s=100)
+        plt.scatter(model_data['White SNR'], model_data['RMSE test'], label=model, s=100)
 
 
     # Labels, title, and legend
