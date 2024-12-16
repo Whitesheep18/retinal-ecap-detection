@@ -3,16 +3,9 @@
 
 if __name__ == "__main__":
     #python spike_detection/train.py --models LinearRegression --dataset DS_0_0_0
-    import numpy as np
     import argparse
     import os
-    import glob
     import sys
-    import pickle
-    import aeon
-    import datetime as dt
-    from sklearn.model_selection import train_test_split
-    from sklearn.metrics import root_mean_squared_error, r2_score
     from src.train_and_eval import train_and_eval
     from src.utils import sorting_key
 

@@ -27,10 +27,15 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         X_temp, y_class_temp, y_reg_temp, test_size=0.5, random_state=42)
 
     classifier.fit(X_train, y_class_train)
+
+    y_class_train_pred = classifier.predict(X_train)
     y_class_val_pred = classifier.predict(X_val)
     y_class_test_pred = classifier.predict(X_test)
+
+    accuracy_train = accuracy_score(y_class_train, y_class_train_pred)
     accuracy = accuracy_score(y_class_test, y_class_test_pred)
-    if verbose: print("Test Classifier Accuracy:", accuracy)
+    
+    if verbose: print("Train and test Classifier Accuracy:", accuracy_train, accuracy)
 
     class1_indices_val = y_class_val_pred == 1
     X_class1_val = X_val[class1_indices_val]
@@ -51,29 +56,34 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         model.fit(X_class1_train, y_reg_class1_train)
 
     if  model_name == "AveragePrediction":
-        y_pred = model.predict(y_reg_class1_train,X_class1_test)
+        y_pred_train = model.predict(y_reg_class1_train, X_class1_train)
+        y_pred = model.predict(y_reg_class1_train, X_class1_test)
     elif model_name == "InceptionTime":
-        y_pred, y_individual = model.predict(X_class1_test)
+        y_pred_train, _ = model.predict(X_class1_train)
+        y_pred, _ = model.predict(X_class1_test)
     else:
+        y_pred_train = model.predict(X_class1_train)
         y_pred = model.predict(X_class1_test)
 
     if verbose: print("Evaluating model")
 
+    r2_train = r2_score(y_reg_class1_train, y_pred_train)
+    rmse_train = r2_score(y_reg_class1_train, y_pred_train)
+                        
     r2 = r2_score(y_reg_class1_test, y_pred)
     rmse = root_mean_squared_error(y_reg_class1_test, y_pred)
 
-    if verbose: print(f"RMSE: {rmse}, R2: {r2}")
-        
-    results_dir = os.path.dirname(results)
-    if results_dir and not os.path.exists(results_dir):
-        os.makedirs(results_dir)
+    if verbose: print(f"Train and test RMSE: {rmse_train}, {rmse}, R2: {r2_train}, {r2}")
 
     file_exists = os.path.isfile(results)
     with open(results, mode='a', newline='') as f:
         writer = csv.writer(f)
         
         if not file_exists:
-            writer.writerow(["Date", "Model", "RMSE", "Accuracy", "R2", "Dataset", "White SNR", "ME SNR", "y_pred", "y_test", "comment", "params"])
+            writer.writerow(["Date", "Model", "Dataset", "White SNR", "ME SNR", 
+                             "Accuracy train", "Accuracy test", "RMSE train", "RMSE test", "R2 train", "R2 test",
+                              "comment", "params",
+                             "y_pred", "y_test"])
         
         y_pred = ', '.join(map(str, y_pred))
         y_test = ', '.join(map(str, y_reg_class1_test))
@@ -81,16 +91,19 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         writer.writerow([
             dt.datetime.now(), 
             model_name, 
-            rmse, 
-            accuracy,
-            r2, 
             dataset.split('/')[-1],  # Get the dataset name from the path
             SNR,
             ME, 
+            accuracy_train,
+            accuracy,
+            rmse_train,
+            rmse, 
+            r2_train,
+            r2, 
+            comment,
+            model.get_params(),
             y_pred,
             y_test, 
-            comment,
-            model.get_params()
         ])
     
     if save_model_path != "False":

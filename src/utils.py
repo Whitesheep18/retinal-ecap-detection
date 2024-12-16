@@ -54,7 +54,7 @@ def sorting_key(dataset_name):
 
 
 # Set up plotting enviroment
-fs = 20  # font size
+fs = 10  # font size
 rcParams = {
     "font.family": "sans-serif", 
     'text.usetex': False, 
