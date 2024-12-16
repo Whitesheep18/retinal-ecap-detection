@@ -1,12 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 from datetime import datetime
 import pandas as pd
-import ast
+from src.utils import save_figure
 
 def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
-    from utils import save_figure
+
     # Load the CSV file
     data = pd.read_csv(csv_file_path)
 
@@ -34,7 +33,6 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
 
 
 def pred_test_plot(csv_file_path, model_name, me_level=None):
-    from utils import save_figure
     data = pd.read_csv(csv_file_path)
     
     filtered_data = data[data['Model'] == model_name]
@@ -71,7 +69,6 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
 
 
 def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
-    from utils import save_figure
     data = pd.read_csv(csv_file_path)
     filtered_data = data[(data['Model'] == model_name) & (data['White SNR'] == snr_value)]
     if me_level is not None:
@@ -101,8 +98,7 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
 
 
 def residual_plot_individual(y_individual, y_test):
-    from utils import save_figure
-        # Ensure y_test is a 1D array.
+    # Ensure y_test is a 1D array.
     y_test = np.asarray(y_test).flatten()
 
     # Ensure shapes match for subtraction.
@@ -149,5 +145,5 @@ def residual_plot_individual(y_individual, y_test):
 
 
 #RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
-#pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=30)
+#pred_test_plot('spike_detection/results.csv', 'LinearRegression', me_level=10)
 #residual_plot('spike_detection/results.csv', 'DrCIFRegressor', 80, me_level=30)
