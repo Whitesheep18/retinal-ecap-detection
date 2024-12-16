@@ -68,7 +68,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     if verbose: print("Evaluating model")
 
     r2_train = r2_score(y_reg_class1_train, y_pred_train)
-    rmse_train = r2_score(y_reg_class1_train, y_pred_train)
+    rmse_train = root_mean_squared_error(y_reg_class1_train, y_pred_train)
                         
     r2 = r2_score(y_reg_class1_test, y_pred)
     rmse = root_mean_squared_error(y_reg_class1_test, y_pred)
