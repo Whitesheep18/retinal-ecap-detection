@@ -158,9 +158,13 @@ class InceptionTime():
             num_steps = len(train_dataset)*self.epochs
             epoch = 0
             # Early stopping parameters
-            patience = 10 
+            patience = 10
+            moving_avg_window = 5
             best_val_loss = float('inf')
             patience_counter = 0
+            val_loss_history = [float('inf')] * moving_avg_window
+            moving_avg_val_loss = float('inf')
+
             with tqdm(range(num_steps)) as pbar:
                 running_loss = 0.0
                 epoch_loss = 0.0
@@ -178,7 +182,7 @@ class InceptionTime():
                     # Report
                     if step % 10 ==0 and self.verbose:
                         loss = loss.detach().cpu()
-                        pbar.set_description(f"epoch={epoch+1}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}, valid_loss={avg_val_loss:.1f}")
+                        pbar.set_description(f"epoch={epoch+1}, step={step}, current_loss={loss:.1f}, epoch_loss={epoch_loss:.1f}, moving_valid_loss={moving_avg_val_loss:.1f}")
 
                     if (step+1) % len(train_dataset) == 0:
                         epoch_loss = running_loss/len(train_dataset)
@@ -195,12 +199,15 @@ class InceptionTime():
                         self.models[m].train(True)
                         avg_val_loss = val_loss / len(val_dataset)
                         self.valid_loss[m].append(avg_val_loss)
+                        val_loss_history.append(avg_val_loss)
+                        val_loss_history.pop(0)  # Maintain a fixed-size window
+                        moving_avg_val_loss = np.mean(val_loss_history)
                         epoch += 1
 
                         if epoch > 10:
                             # Early stopping logic
-                            if avg_val_loss < best_val_loss:
-                                best_val_loss = avg_val_loss
+                            if moving_avg_val_loss < best_val_loss:
+                                best_val_loss = moving_avg_val_loss
                                 patience_counter = 0 
                             else:
                                 patience_counter += 1
@@ -336,6 +343,7 @@ if __name__ == '__main__':
     dataset = 'simulated_data/DS_80_30_10'
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
+
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
