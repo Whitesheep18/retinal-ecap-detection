@@ -11,7 +11,7 @@ class InceptionTime():
                  depth=6,
                  init_stride=-1,
                  n_models=5,
-                 learning_rate= 0.00007,
+                 learning_rate= 0.0001,
                  batch_size=32,
                  epochs = 3,
                  dropout = 0,
@@ -340,19 +340,15 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import numpy as np
 
-    dataset = 'simulated_data/DS_80_30_10_8000'
+    dataset = 'simulated_data/DS_80_30_10'
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
-    # Filter the data where y >= 5
-    mask = y >= 5
-    X = X[mask]
-    y = y[mask]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 2, epochs=500, init_stride=2, depth=9, dropout=0.0, learning_rate=0.00002)
+    model = InceptionTime(n_models = 3, epochs=70, init_stride=2, depth=6, dropout=0.1)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred, y_individual = model.predict(X_test)
