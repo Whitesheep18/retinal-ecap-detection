@@ -9,7 +9,6 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
     # Load the CSV file
     data = pd.read_csv(csv_file_path)
 
-
     # Plot SNR vs RMSE for each model
     plt.figure(figsize=(10, 6))
     for model in data['Model'].unique():
@@ -28,7 +27,7 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
         plt.ylim(*y_range)
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'snr_rms_plot_{timestamp}.png'
+    filename = f'snr_rms_plot_{timestamp}'
     save_figure(name=filename, figdir='./plots')    
 
 
@@ -42,12 +41,14 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
         return
 
     snr_levels = sorted(filtered_data['White SNR'].unique())
+    snr_levels = [-10, 80]
     colors = plt.cm.get_cmap('tab10', len(snr_levels))  # Choose a colormap
     
     plt.figure(figsize=(10, 6))
     for idx, snr_value in enumerate(snr_levels):
         snr_data = filtered_data[filtered_data['White SNR'] == snr_value]
         if me_level is not None:
+            print('hi')
             snr_data = snr_data[snr_data['ME SNR'] == me_level]
 
                 
@@ -64,7 +65,7 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
     plt.grid(True)
     plt.legend(title='White SNR levels')
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'{model_name}_y_test_y_pred_plot_{timestamp}.png'
+    filename = f'{model_name}_y_test_y_pred_plot_{timestamp}'
     save_figure(name=filename, figdir='./plots')
 
 
@@ -93,7 +94,7 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
     plt.title(f'Residual Plot for {model_name} at White SNR = {snr_value}{", ME SNR = "+str(me_level) if me_level is not None else ""}')
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'{model_name}_residual_plot_{snr_value}_{timestamp}.png'
+    filename = f'{model_name}_residual_plot_{snr_value}_{timestamp}'
     save_figure(name=filename, figdir='./plots')
 
 
@@ -136,7 +137,7 @@ def residual_plot_individual(y_individual, y_test):
     plt.tight_layout()
 
     # Save the plot to file
-    filename = 'res.png'
+    filename = 'res'
     save_figure(name=filename, figdir='./plots')
 
 
@@ -145,5 +146,5 @@ def residual_plot_individual(y_individual, y_test):
 
 
 #RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
-#pred_test_plot('spike_detection/results.csv', 'LinearRegression', me_level=10)
-#residual_plot('spike_detection/results.csv', 'DrCIFRegressor', 80, me_level=30)
+#pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=10)
+#residual_plot('spike_detection/results.csv', 'InceptionTime', 80, me_level=10)
