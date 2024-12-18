@@ -5,10 +5,11 @@ import pandas as pd
 from src.utils import save_figure
 
 def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
-
     # Load the CSV file
+    colors = {"LinearRegression":"#1f77b4", "ThresholdBased":"#ff7f0e", 
+              "DrCIFRegressor":"#2ca02c", "AveragePrediction":"#d62728", 
+              "InceptionTime": "#9467bd"} #from tab10
     data = pd.read_csv(csv_file_path)
-
 
     # Plot SNR vs RMSE for each model
     plt.figure(figsize=(10, 6))
@@ -16,7 +17,8 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
         model_data = data[data['Model'] == model]
         if me_level is not None:
             model_data = model_data[model_data['ME SNR'] == me_level]
-        plt.scatter(model_data['White SNR'], model_data['RMSE'], label=model, s=100)
+        color = colors[model] if model in colors else 'black'
+        plt.scatter(model_data['White SNR'], model_data['RMSE test'], label=model, s=100, c=color, alpha=0.5)
 
 
     # Labels, title, and legend
@@ -28,11 +30,15 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
         plt.ylim(*y_range)
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'snr_rms_plot_{timestamp}.png'
+    filename = f'snr_rms_plot_{timestamp}'
     save_figure(name=filename, figdir='./plots')    
 
 
-def pred_test_plot(csv_file_path, model_name, me_level=None):
+def pred_test_plot(csv_file_path, model_name, me_level=None, snr_levels=None):
+    """
+    if snr_levels is None: use all
+    otherwise snr levels is a list of exisiting snr levels within results file
+    """
     data = pd.read_csv(csv_file_path)
     
     filtered_data = data[data['Model'] == model_name]
@@ -40,14 +46,15 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
     if filtered_data.empty:
         print(f"No data found for Model: {model_name}")
         return
-
-    snr_levels = sorted(filtered_data['White SNR'].unique())
+    if snr_levels is None:
+        snr_levels = sorted(filtered_data['White SNR'].unique())
     colors = plt.cm.get_cmap('tab10', len(snr_levels))  # Choose a colormap
     
     plt.figure(figsize=(10, 6))
     for idx, snr_value in enumerate(snr_levels):
         snr_data = filtered_data[filtered_data['White SNR'] == snr_value]
         if me_level is not None:
+            print('hi')
             snr_data = snr_data[snr_data['ME SNR'] == me_level]
 
                 
@@ -64,7 +71,7 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
     plt.grid(True)
     plt.legend(title='White SNR levels')
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'{model_name}_y_test_y_pred_plot_{timestamp}.png'
+    filename = f'{model_name}_y_test_y_pred_plot_{timestamp}'
     save_figure(name=filename, figdir='./plots')
 
 
@@ -93,7 +100,7 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
     plt.title(f'Residual Plot for {model_name} at White SNR = {snr_value}{", ME SNR = "+str(me_level) if me_level is not None else ""}')
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'{model_name}_residual_plot_{snr_value}_{timestamp}.png'
+    filename = f'{model_name}_residual_plot_{snr_value}_{timestamp}'
     save_figure(name=filename, figdir='./plots')
 
 
@@ -136,7 +143,7 @@ def residual_plot_individual(y_individual, y_test):
     plt.tight_layout()
 
     # Save the plot to file
-    filename = 'res.png'
+    filename = 'res'
     save_figure(name=filename, figdir='./plots')
 
 
@@ -144,6 +151,6 @@ def residual_plot_individual(y_individual, y_test):
     
 
 
-#RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
-#pred_test_plot('spike_detection/results.csv', 'LinearRegression', me_level=10)
-#residual_plot('spike_detection/results.csv', 'DrCIFRegressor', 80, me_level=30)
+RMSE_SNR_plot('spike_detection/results.csv', me_level=80, y_range=None)
+#pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=10)
+#residual_plot('spike_detection/results.csv', 'InceptionTime', 80, me_level=10)

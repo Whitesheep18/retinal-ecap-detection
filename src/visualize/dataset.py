@@ -88,7 +88,6 @@ def plot_target_value_distribution(path_to_datasets):
     for dataset in datasets:
         y = np.load(os.path.join(path_to_datasets, dataset, "y_reg.npy"))
         y = y[y!=0]
-        density = sns.kdeplot(y, label=dataset)
     
     plt.title("Distribution of non-zero counts for all datasets")
     plt.legend()
