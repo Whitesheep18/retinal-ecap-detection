@@ -97,7 +97,7 @@ if __name__ == "__main__":
     idx = int(sys.argv[1])
 
     white_snr_range = [-10,0,10,20,50,80]
-    ME_snr_range = [10, 30]
+    ME_snr_range = [10, 80]
 
     white_snr_idx = (idx-1)%len(white_snr_range)
     ME_snr_idx = (idx-1)//len(white_snr_range)
