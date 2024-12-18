@@ -5,8 +5,10 @@ import pandas as pd
 from src.utils import save_figure
 
 def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
-
     # Load the CSV file
+    colors = {"LinearRegression":"#1f77b4", "ThresholdBased":"#ff7f0e", 
+              "DrCIFRegressor":"#2ca02c", "AveragePrediction":"#d62728", 
+              "InceptionTime": "#9467bd"} #from tab10
     data = pd.read_csv(csv_file_path)
 
     # Plot SNR vs RMSE for each model
@@ -15,7 +17,8 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
         model_data = data[data['Model'] == model]
         if me_level is not None:
             model_data = model_data[model_data['ME SNR'] == me_level]
-        plt.scatter(model_data['White SNR'], model_data['RMSE test'], label=model, s=100)
+        color = colors[model] if model in colors else 'black'
+        plt.scatter(model_data['White SNR'], model_data['RMSE test'], label=model, s=100, c=color, alpha=0.5)
 
 
     # Labels, title, and legend
@@ -31,7 +34,11 @@ def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
     save_figure(name=filename, figdir='./plots')    
 
 
-def pred_test_plot(csv_file_path, model_name, me_level=None):
+def pred_test_plot(csv_file_path, model_name, me_level=None, snr_levels=None):
+    """
+    if snr_levels is None: use all
+    otherwise snr levels is a list of exisiting snr levels within results file
+    """
     data = pd.read_csv(csv_file_path)
     
     filtered_data = data[data['Model'] == model_name]
@@ -39,9 +46,8 @@ def pred_test_plot(csv_file_path, model_name, me_level=None):
     if filtered_data.empty:
         print(f"No data found for Model: {model_name}")
         return
-
-    snr_levels = sorted(filtered_data['White SNR'].unique())
-    snr_levels = [-10, 80]
+    if snr_levels is None:
+        snr_levels = sorted(filtered_data['White SNR'].unique())
     colors = plt.cm.get_cmap('tab10', len(snr_levels))  # Choose a colormap
     
     plt.figure(figsize=(10, 6))
@@ -145,6 +151,6 @@ def residual_plot_individual(y_individual, y_test):
     
 
 
-#RMSE_SNR_plot('spike_detection/results.csv', me_level=10, y_range=None)
+RMSE_SNR_plot('spike_detection/results.csv', me_level=80, y_range=None)
 #pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=10)
 #residual_plot('spike_detection/results.csv', 'InceptionTime', 80, me_level=10)
