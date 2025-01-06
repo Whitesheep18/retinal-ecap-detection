@@ -54,7 +54,7 @@ def sorting_key(dataset_name):
 
 
 # Set up plotting enviroment
-fs = 10  # font size
+fs = 7  # font size
 rcParams = {
     "font.family": "sans-serif", 
     'text.usetex': False, 
@@ -80,7 +80,7 @@ def save_figure(name, figdir=None, width=6, height=4):
     if not os.path.exists(figdir):
         os.makedirs(figdir)  # Ensure the directory exists
 
-    filepath = os.path.join(figdir, f"{name}.png")
+    filepath = os.path.join(figdir, f"{name}.pdf")
     plt.gcf().set_size_inches(width, height)
     plt.savefig(filepath, bbox_inches='tight')
     plt.close()
