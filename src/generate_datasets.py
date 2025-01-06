@@ -21,7 +21,7 @@ def get_noised_recording_stim(rec, num_stim = 15, num_samples = 300, window_size
     while i < num_samples:
         for SA_end_idx in range(len(SA_ends)):
             if i >= num_samples: break
-            window_start = SA_ends[SA_end_idx]
+            window_start = SA_ends[SA_end_idx]+1
             X[i] = noised_data[window_start:window_start+window_size]
             # count spikes fully contained in this window
             y_reg[i] = len([x for x in AP_indexes if x[0] >= window_start and x[-1] <= window_start+window_size])
