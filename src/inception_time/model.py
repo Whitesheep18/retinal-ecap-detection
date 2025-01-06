@@ -71,8 +71,8 @@ class InceptionTime():
 
 
     def _set_scalers(self, x):
-        self.mu = np.nanmean(x, axis=0, keepdims=True)
-        self.sigma = np.nanstd(x, axis=0, keepdims=True)
+        self.mu = np.nanmean(x)
+        self.sigma = np.nanstd(x)
 
     def _build_models(self):
         self.models = [
