@@ -2,7 +2,7 @@ import pickle
 import datetime as dt
 import os
 import numpy as np
-from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score
+from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score, mean_absolute_percentage_error
 from sklearn.model_selection import train_test_split
 import csv
 from sklearn.ensemble import RandomForestClassifier
@@ -69,11 +69,13 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
 
     r2_train = r2_score(y_reg_class1_train, y_pred_train)
     rmse_train = root_mean_squared_error(y_reg_class1_train, y_pred_train)
+    mape_train = mean_absolute_percentage_error(y_reg_class1_train, y_pred_train)
                         
     r2 = r2_score(y_reg_class1_test, y_pred)
     rmse = root_mean_squared_error(y_reg_class1_test, y_pred)
+    mape = mean_absolute_percentage_error(y_reg_class1_test, y_pred)
 
-    if verbose: print(f"Train and test RMSE: {rmse_train}, {rmse}, R2: {r2_train}, {r2}")
+    if verbose: print(f"Train and test RMSE: {rmse_train}, {rmse}, R2: {r2_train}, {r2}, MAPE: {mape_train}, {mape}")
 
     file_exists = os.path.isfile(results)
     with open(results, mode='a', newline='') as f:
@@ -81,7 +83,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         
         if not file_exists:
             writer.writerow(["Date", "Model", "Dataset", "White SNR", "ME SNR", 
-                             "Accuracy train", "Accuracy test", "RMSE train", "RMSE test", "R2 train", "R2 test",
+                             "Accuracy train", "Accuracy test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
                               "comment", "params",
                              "y_pred", "y_test"])
         
@@ -100,6 +102,8 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             rmse, 
             r2_train,
             r2, 
+            mape_train,
+            mape,
             comment,
             model.get_params(),
             y_pred,
