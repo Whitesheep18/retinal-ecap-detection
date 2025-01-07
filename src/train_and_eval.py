@@ -33,19 +33,21 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     y_class_test_pred = classifier.predict(X_test)
 
     accuracy_train = accuracy_score(y_class_train, y_class_train_pred)
-    accuracy = accuracy_score(y_class_test, y_class_test_pred)
+    accuracy_test = accuracy_score(y_class_test, y_class_test_pred)
     
-    if verbose: print("Train and test Classifier Accuracy:", accuracy_train, accuracy)
+    if verbose: print("Train and test Classifier Accuracy:", accuracy_train, accuracy_test)
 
     class1_indices_val = y_class_val_pred == 1
     X_class1_val = X_val[class1_indices_val]
     y_reg_class1_val = y_reg_val[class1_indices_val]
 
     class1_indices_train = np.array(y_class_train) == 1
+    pct_samples_train = class1_indices_train.sum()/len(class1_indices_train) # fraction of train samples kept
     X_class1_train = X_train[class1_indices_train]
     y_reg_class1_train = y_reg_train[class1_indices_train]
 
     class1_indices_test = np.array(y_class_test_pred) == 1
+    pct_samples_test = class1_indices_test.sum()/len(class1_indices_test) # fraction of test samples kept
     X_class1_test = X_test[class1_indices_test]
     y_reg_class1_test = y_reg_test[class1_indices_test]
 
@@ -71,18 +73,18 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     rmse_train = root_mean_squared_error(y_reg_class1_train, y_pred_train)
     mape_train = mean_absolute_percentage_error(y_reg_class1_train, y_pred_train)
                         
-    r2 = r2_score(y_reg_class1_test, y_pred)
-    rmse = root_mean_squared_error(y_reg_class1_test, y_pred)
-    mape = mean_absolute_percentage_error(y_reg_class1_test, y_pred)
+    r2_test = r2_score(y_reg_class1_test, y_pred)
+    rmse_test = root_mean_squared_error(y_reg_class1_test, y_pred)
+    mape_test = mean_absolute_percentage_error(y_reg_class1_test, y_pred)
 
-    if verbose: print(f"Train and test RMSE: {rmse_train}, {rmse}, R2: {r2_train}, {r2}, MAPE: {mape_train}, {mape}")
+    if verbose: print(f"Train and test RMSE: {rmse_train}, {rmse_test}, R2: {r2_train}, {r2_test}, MAPE: {mape_train}, {mape_test}")
 
     file_exists = os.path.isfile(results)
     with open(results, mode='a', newline='') as f:
         writer = csv.writer(f)
         
         if not file_exists:
-            writer.writerow(["Date", "Model", "Dataset", "White SNR", "ME SNR", 
+            writer.writerow(["Date", "Model", "Dataset", "White SNR", "ME SNR", "% samples after clf train", "% samples after clf test",
                              "Accuracy train", "Accuracy test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
                               "comment", "params",
                              "y_pred", "y_test"])
@@ -96,14 +98,16 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             dataset.split('/')[-1],  # Get the dataset name from the path
             SNR,
             ME, 
+            pct_samples_train,
+            pct_samples_test,
             accuracy_train,
-            accuracy,
+            accuracy_test,
             rmse_train,
-            rmse, 
+            rmse_test, 
             r2_train,
-            r2, 
+            r2_test, 
             mape_train,
-            mape,
+            mape_test,
             comment,
             model.get_params(),
             y_pred,
