@@ -18,6 +18,7 @@ if __name__ == "__main__":
     parser.add_argument('--verbose', type=int, default=1, help="print what's going on")
     parser.add_argument('--comment', type=str, default='', help="anything else (eg. jobid) you want to add")
     # inception time arguments
+    parser.add_argument('--n_models', type=int, default=5, help='number of models in ensemble (original and ours)')
     parser.add_argument('--n_epochs', type=int, default=300, help='number of epochs in InceptionTime (original and ours)')
     parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate in InceptionTime (original and ours)')
     parser.add_argument('--dropout', type=float, default=0, help='portion of weights to forget in InceptionTime (ours)')
@@ -51,7 +52,8 @@ if __name__ == "__main__":
         elif model == "InceptionTime":
             from src.inception_time.model import InceptionTime
             model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, 
-                                  dropout=args.dropout, l2_penalty=args.l2_penalty, init_stride=args.init_stride)
+                                  dropout=args.dropout, l2_penalty=args.l2_penalty, init_stride=args.init_stride,
+                                  n_models=args.n_models)
         elif model == "AveragePrediction":
             from src.average_method import AveragePrediction
             model = AveragePrediction()
