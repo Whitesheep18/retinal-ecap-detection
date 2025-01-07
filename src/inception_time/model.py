@@ -69,6 +69,8 @@ class InceptionTime():
         self.train_loss = [[] for i in range(n_models)]
         self.valid_loss = [[] for i in range(n_models)]
 
+        self.is_fitted = False
+
 
     def _set_scalers(self, x):
         self.mu = np.nanmean(x)
@@ -217,11 +219,13 @@ class InceptionTime():
                             
 
             self.models[m].train(False)
+            self.is_fitted = True
 
+    def is_fitted(self):
+        return self.fitted
     
     def predict(self, x):
-        # TODO: is_fitted()
-        
+
         '''
         Predict the class labels.
 
@@ -234,28 +238,48 @@ class InceptionTime():
 
         Returns:
         __________________________________
-        y: np.array.
+        y_avg: np.array.
             Predicted labels, array with shape (samples,) where samples is the number of time series.
+            
+        y_individual: np.array
+            Predicted labels for each model in self.models
         '''
 
-        # Scale the data.
         x = x[:, np.newaxis, :]
-        x = torch.from_numpy((x - self.mu) / self.sigma).float().to(self.device)
+        x = torch.from_numpy((x - self.mu) / self.sigma).float()
 
+        test_dataset = torch.utils.data.DataLoader(
+                        dataset=torch.utils.data.TensorDataset(x),
+                        batch_size=self.batch_size,
+                        shuffle=False
+                        )
+        y_avg, y_individual = [], []
 
-        # Get the predicted probabilities.
-        with torch.no_grad():
-            outputs = torch.concat([model(x).unsqueeze(-1) for model in self.models], dim=-1)
+        num_steps = len(test_dataset)
+        with tqdm(range(num_steps)) as pbar:
+            tds = iter(test_dataset)
+            for step in pbar:
+                features = next(tds)[0]
 
-        # Convert outputs to numpy array for individual predictions.
-        y_individual = outputs.detach().cpu().numpy()
+                # Get the predicted probabilities.
+                with torch.no_grad():
+                    outputs = torch.concat([model(features.to(self.device)) for model in self.models], dim=-1)
 
-        # Calculate the average prediction.
-        y_avg = y_individual.mean(axis=-1).flatten()
+                # Convert outputs to numpy array for individual predictions.
+                y_individual_batch = outputs.detach().cpu().numpy()
+                y_individual.append(y_individual_batch)
 
+                # Calculate the average prediction.
+                y_avg_batch = y_individual_batch.mean(axis=-1).flatten()
+                y_avg.append(y_avg_batch)
+
+                if step % 10 ==0 and self.verbose:
+                    pbar.set_description(f"batch={step}")
+
+        y_avg = np.concatenate(y_avg)
+        y_individual = np.concatenate(y_individual)
         return y_avg, y_individual
     
-
     def save(self, file_path):
 
         meta_file_path = f"{file_path}_metadata.pkl"
