@@ -171,6 +171,5 @@ class InceptionModel(torch.nn.Module):
                 x = y
         y = self.model.get_submodule('avg_pool')(y)
         y = self.model.get_submodule('linear')(y)
-        y = self.model.get_submodule('dropout')(y)
         #torch.nn.functional.relu(y)? # counts are never negative. maybe log-exp space is better? maybe it should be handled in the loss function
         return y
