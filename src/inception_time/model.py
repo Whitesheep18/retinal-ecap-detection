@@ -4,7 +4,7 @@ import pickle
 from src.inception_time.modules import InceptionModel
 from tqdm import tqdm
 
-class InceptionTime():
+class InceptionTimeE():
     
     def __init__(self,
                  filters=32,
@@ -161,7 +161,7 @@ class InceptionTime():
             epoch = 0
             # Early stopping parameters
             patience = 10
-            moving_avg_window = 5
+            moving_avg_window = 10
             best_val_loss = float('inf')
             patience_counter = 0
             val_loss_history = [float('inf')] * moving_avg_window
@@ -206,7 +206,7 @@ class InceptionTime():
                         moving_avg_val_loss = np.mean(val_loss_history)
                         epoch += 1
 
-                        if epoch > 10:
+                        if epoch > 50:
                             # Early stopping logic
                             if moving_avg_val_loss < best_val_loss:
                                 best_val_loss = moving_avg_val_loss
@@ -364,7 +364,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import numpy as np
 
-    dataset = 'simulated_data/DS_80_30_10'
+    dataset = 'simulated_data/DS_80_80_10'
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
 
@@ -372,7 +372,7 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTime(n_models = 3, epochs=70, init_stride=2, depth=6, dropout=0.1)
+    model = InceptionTimeE(n_models = 3, epochs=150, init_stride=2, depth=6, dropout=0.0, learning_rate=0.0001)
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred, y_individual = model.predict(X_test)
@@ -387,6 +387,6 @@ if __name__ == '__main__':
 
     # model.save('../../models/InceptionTime_DS_80_10_10')
 
-    # model2 = InceptionTime()
+    # model2 = InceptionTimeE()
     # model2.load('../../models/InceptionTime_DS_80_10_10')
     
