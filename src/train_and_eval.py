@@ -52,7 +52,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     y_reg_class1_test = y_reg_test[class1_indices_test]
 
     
-    if model_name == 'InceptionTime':
+    if model_name == 'InceptionTimeE':
         model.fit(X_class1_train, y_reg_class1_train, X_class1_val, y_reg_class1_val)
     else: 
         model.fit(X_class1_train, y_reg_class1_train)
@@ -60,7 +60,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     if  model_name == "AveragePrediction":
         y_pred_train = model.predict(y_reg_class1_train, X_class1_train)
         y_pred = model.predict(y_reg_class1_train, X_class1_test)
-    elif model_name == "InceptionTime":
+    elif model_name == "InceptionTimeE":
         y_pred_train, _ = model.predict(X_class1_train)
         y_pred, _ = model.predict(X_class1_test)
     else:
@@ -120,10 +120,10 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             print('Saving model to', model_path)
             with open(model_path, "wb") as f:
                 pickle.dump(model, f)
-        elif model_name == 'InceptionTime':
+        elif model_name == 'InceptionTimeE':
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}")
             model.save(model_path)
 
-    if model_name == 'InceptionTime':
+    if model_name == 'InceptionTimeE':
         from src.visualize.training import plot_loss
         plot_loss(model.train_loss, model.valid_loss, title=f'Trained on {os.path.basename(dataset)}', id=comment)
