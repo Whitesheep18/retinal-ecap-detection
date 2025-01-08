@@ -120,7 +120,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             print('Saving model to', model_path)
             with open(model_path, "wb") as f:
                 pickle.dump(model, f)
-        elif model_name == 'InceptionTime':
+        elif model_name == 'InceptionTimeE':
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}")
             model.save(model_path)
 
