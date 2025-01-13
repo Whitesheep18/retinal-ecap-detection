@@ -17,5 +17,5 @@ def plot_loss(train_loss, validation_loss=None, title='Loss', id=''):
     plt.ylabel('Loss')
     plt.legend()
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    filename = f'loss_{id}_{timestamp}.png'
+    filename = f'loss_{id}_{timestamp}'
     save_figure(name=filename, figdir='./plots')
