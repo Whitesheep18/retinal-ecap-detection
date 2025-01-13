@@ -91,6 +91,12 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         
         y_pred = ', '.join(map(str, y_pred))
         y_test = ', '.join(map(str, y_reg_class1_test))
+
+        params = model.get_params()
+
+        if params.get('init_stride') == -1:
+            model_name = model_name + "Original"
+
         # Write the data row
         writer.writerow([
             dt.datetime.now(), 
@@ -109,7 +115,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             mape_train,
             mape_test,
             comment,
-            model.get_params(),
+            params,
             y_pred,
             y_test, 
         ])
@@ -120,10 +126,10 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             print('Saving model to', model_path)
             with open(model_path, "wb") as f:
                 pickle.dump(model, f)
-        elif model_name == 'InceptionTimeE':
+        else:
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}")
             model.save(model_path)
 
-    if model_name == 'InceptionTimeE':
+    if model_name.startswith('InceptionTimeE'):
         from src.visualize.training import plot_loss
-        plot_loss(model.train_loss, model.valid_loss, title=f'Trained on {os.path.basename(dataset)}', id=comment)
+        plot_loss(model.train_loss, model.valid_loss, title=f'Trained {model_name} on {os.path.basename(dataset)}', id=comment)
