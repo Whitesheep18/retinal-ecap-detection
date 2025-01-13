@@ -14,10 +14,12 @@ source ../irishcream/bin/activate
 
 
 python spike_detection/tune.py --dataset_idx $LSB_JOBINDEX --results spike_detection/results_tuning_stride.csv  --comment "jobid: $LSB_JOBID" --hp_tune_type "grid" \
-                               --learning_rate_list 0.0001\
-                               --dropout_list 0.2 \
-                               --l2_penalty_list 0.0001 \
-                               --init_stride_list 3 -1 2
-
+                               --n_models 5 \
+                               --n_epochs 1500 \
+                               --min_n_epochs_list 50 \
+                               --learning_rate_list 0.00001 0.0001 0.001\
+                               --dropout_list 0 0.3\
+                               --l2_penalty_list 0 0.001 \
+                               --init_stride_list 2 -1
 
 # run with: bsub < spike_detection/all_dataset_hp_tune_job_array.sh

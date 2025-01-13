@@ -15,6 +15,7 @@ class InceptionTimeE():
                  learning_rate= 0.0001,
                  batch_size=32,
                  epochs = 3,
+                 min_epochs = 1,
                  dropout = 0,
                  l2_penalty = 0,
                  optimizer = 'Adam',
@@ -37,7 +38,10 @@ class InceptionTimeE():
             Batch size.
 
         epochs: int.
-            Number of epochs.
+            Maximum number of epochs.
+
+        min_epochs: int.
+            Minimum number of epochs before early stopping. If min_epochs > epochs, no early stopping is applied
 
         verbose: bool.
             True if the training history should be printed in the console, False otherwise.
@@ -61,6 +65,7 @@ class InceptionTimeE():
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.epochs = epochs
+        self.min_epochs = min_epochs
         self.dropout = dropout
         self.l2_penalty = l2_penalty
         self.verbose = verbose
@@ -212,7 +217,7 @@ class InceptionTimeE():
                         moving_avg_val_loss = np.mean(val_loss_history)
                         epoch += 1
 
-                        if epoch > 50:
+                        if epoch > self.min_epochs:
                             # Early stopping logic
                             if moving_avg_val_loss < best_val_loss:
                                 best_val_loss = moving_avg_val_loss
@@ -340,13 +345,15 @@ class InceptionTimeE():
                 'learning_rate': self.learning_rate,
                 'batch_size': self.batch_size,
                 'epochs': self.epochs,
+                'min_epochs': self.min_epochs,
                 'dropout': self.dropout,
                 'l2_penalty': self.l2_penalty,
                 'verbose': self.verbose,
                 'filters':  self.filters,
                 'init_stride': self.init_stride,
                 'depth': self.depth,
-                'n_models': self.n_models
+                'n_models': self.n_models,
+                'optimizer': self.optimizer
                 }
 
     def set_params(self, params):
@@ -356,11 +363,13 @@ class InceptionTimeE():
         self.l2_penalty = params["l2_penalty"]
         self.batch_size = params["batch_size"]
         self.epochs = params["epochs"]
+        self.min_epochs = params["min_epochs"]
         self.verbose = params["verbose"]
         self.filters = params["filters"]
         self.init_stride = params["init_stride"]
         self.depth = params["depth"]
         self.n_models = params["n_models"]
+        self.optimizer = params["optimizer"]
 
 
 if __name__ == '__main__':

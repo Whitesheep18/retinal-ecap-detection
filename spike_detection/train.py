@@ -18,12 +18,13 @@ if __name__ == "__main__":
     parser.add_argument('--verbose', type=int, default=1, help="print what's going on")
     parser.add_argument('--comment', type=str, default='', help="anything else (eg. jobid) you want to add")
     # inception time arguments
-    parser.add_argument('--n_models', type=int, default=5, help='number of models in ensemble (original and ours)')
-    parser.add_argument('--n_epochs', type=int, default=300, help='number of epochs in InceptionTime (original and ours)')
-    parser.add_argument('--learning_rate', type=float, default=0.0001, help='learning rate in InceptionTime (original and ours)')
-    parser.add_argument('--dropout', type=float, default=0.0, help='portion of weights to forget in InceptionTime (ours)')
-    parser.add_argument('--l2_penalty', type=float, default=0, help='l2 penalty in InceptionTime (ours)')
-    parser.add_argument('--init_stride', type=int, default=2, help='rate of initial downsampling CNN in InceptionTime (ours big time)')
+    parser.add_argument('--n_models', type=int, default=5, help='number of models in InceptionTimeE')
+    parser.add_argument('--n_epochs', type=int, default=300, help='number of epochs in InceptionTime')
+    parser.add_argument('--min_n_epochs', type=int, default=1, help='minimum number of epochs before early stopping in InceptionTime')
+    parser.add_argument('--learning_rate', type=float, default=0.0001, help='learning rate in InceptionTime')
+    parser.add_argument('--dropout', type=float, default=0.0, help='portion of weights to forget in InceptionTime')
+    parser.add_argument('--l2_penalty', type=float, default=0, help='l2 penalty in InceptionTime')
+    parser.add_argument('--init_stride', type=int, default=2, help='stride of initial cnn in InceptionTime. If zero or less, no initial cnn is applied')
     args = parser.parse_args()
 
     if args.dataset_idx is not None:
@@ -51,12 +52,13 @@ if __name__ == "__main__":
             model = DrCIFRegressor(n_estimators=10, min_interval_length= 100, random_state=0)
         elif model == "InceptionTimeE":
             from src.inception_time.model import InceptionTimeE
-            model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, 
+            model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs, min_epochs = args.min_n_epochs, learning_rate=args.learning_rate, 
                                   dropout=args.dropout, l2_penalty=args.l2_penalty, init_stride=args.init_stride,
                                   n_models=args.n_models, optimizer='AdamW')
         elif model == "InceptionTimeEOriginal":
             from src.inception_time.model import InceptionTimeE
-            model = InceptionTimeE(verbose=args.verbose, epochs=1500, learning_rate=0.001, 
+            n_epochs = 1500
+            model = InceptionTimeE(verbose=args.verbose, epochs=n_epochs, min_epochs=n_epochs+1, learning_rate=0.001, 
                             dropout=0, l2_penalty=0, init_stride=-1, n_models=5, depth=6, filters=32, batch_size=64)
         elif model == "AveragePrediction":
             from src.average_method import AveragePrediction
