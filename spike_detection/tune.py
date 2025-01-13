@@ -9,6 +9,7 @@ if __name__ == "__main__":
     from numpy.random import choice
 
     parser = argparse.ArgumentParser(description='Train a model on the simulated data')
+    parser.add_argument('--classification_model', type=str, required=True, choices = ['Filter', 'RandomForestClassifier', 'HIVECOTEV2'], default='Filter', help='classification model or models to train')
     parser.add_argument('--results', type=str, default='results.csv', help='results_file [.csv]')
     parser.add_argument('--save_model_path', type=str, default='False', help='wether to save the model as pickle [<path_to_model>/False]')
     parser.add_argument('--dataset', type=str, help='path to dataset folder')
@@ -37,6 +38,18 @@ if __name__ == "__main__":
         print("Either dataset or dataset_idx must be given")
         sys.exit(1)
 
+    if args.classification_model == "Filter":
+        from src.filter_classification import Filter
+        classifier = Filter()
+    elif args.classification_model == "RandomForestClassifier":
+        from sklearn.ensemble import RandomForestClassifier
+        classifier = RandomForestClassifier()
+    elif args.classification_model == "HIVECOTEV2":
+        from aeon.classification.hybrid import HIVECOTEV2
+        args.classification_model = HIVECOTEV2(verbose=1, time_limit_in_minutes = 1)
+    else:
+        print(f"Unknown classifcation model {args.classification_model}")
+        sys.exit(1)
 
     if args.hp_tune_type == 'random':
         if args.num_random_hp_comb > len(args.learning_rate_list)*len(args.dropout_list)*len(args.l2_penalty_list):
@@ -57,7 +70,7 @@ if __name__ == "__main__":
             # train model
             print('hyperparameters', hp_comb)
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs,n_models=args.n_models, **hp_comb)
-            train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
+            train_and_eval(model, classifier, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
             hp_combs.append(hp_comb)
 
     elif args.hp_tune_type == 'grid':
@@ -68,7 +81,7 @@ if __name__ == "__main__":
                         for init_stride in args.init_stride_list:
                             model = InceptionTimeE(verbose=args.verbose, n_models=args.n_models, epochs=args.n_epochs, min_epochs = min_n_epochs,
                                                 learning_rate=learning_rate, dropout=dropout, l2_penalty=l2_penalty, init_stride=init_stride)
-                            train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
+                            train_and_eval(model, classifier, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
     else:
         print("Unknown hp_tune_type. Choose")
 

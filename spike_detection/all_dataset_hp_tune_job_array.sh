@@ -14,6 +14,7 @@ source ../irishcream/bin/activate
 
 
 python spike_detection/tune.py --dataset_idx $LSB_JOBINDEX --results spike_detection/results_tuning_stride.csv  --comment "jobid: $LSB_JOBID" --hp_tune_type "grid" \
+                               --classification_model Filter \
                                --n_models 5 \
                                --n_epochs 1500 \
                                --min_n_epochs_list 50 \
