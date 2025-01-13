@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import pandas as pd
 from src.utils import save_figure
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
 def RMSE_SNR_plot(csv_file_path, me_level=None, y_range=(0, 10)):
     # Load the CSV file
@@ -147,7 +149,20 @@ def residual_plot_individual(y_individual, y_test):
     save_figure(name=filename, figdir='./plots')
 
 
+def conf_matrix(classifier_name,  y_true, y_pred, snr_value, me_level, id):
+    cm = confusion_matrix(y_true, y_pred)
+    class_names = ['No activity', 'Activity present']
 
+    # Plot confusion matrix
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+    plt.xlabel('Predicted Label')
+    plt.ylabel('True Label')
+    plt.title(f'Residual Plot for {classifier_name} at White SNR = {snr_value} and ME SNR = {me_level} ')
+    plt.grid(True)
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+    filename = f'cm_{id}_{classifier_name}_{snr_value}_{me_level}_{timestamp}'
+    save_figure(name=filename, figdir='./plots')
     
 
 
