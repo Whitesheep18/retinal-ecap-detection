@@ -2,15 +2,14 @@ import pickle
 import datetime as dt
 import os
 import numpy as np
-from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score, mean_absolute_percentage_error
+from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score, mean_absolute_percentage_error, recall_score, precision_score, f1_score
 from sklearn.model_selection import train_test_split
 import csv
-from sklearn.ensemble import RandomForestClassifier
 
-def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=''):
-
-    classifier = RandomForestClassifier(random_state=0)
+def train_and_eval(model, classifier, dataset, results, save_model_path, verbose=0, comment=''):
+    
     model_name = model.__class__.__name__
+    classifier_name = classifier.__class__.__name__
 
     X = np.load(os.path.join(dataset, "X.npy"))
     y_reg = np.load(os.path.join(dataset, "y_reg.npy"))
@@ -26,37 +25,61 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
     SNR = dataset.split('_')[2]
     ME = dataset.split('_')[3]
 
-    if verbose: print(f"Training classification model {model}")
-
     X_train, X_temp, y_class_train, y_class_temp, y_reg_train, y_reg_temp = train_test_split(
-        X, y_class, y_reg, test_size=0.3, random_state=42)
+    X, y_class, y_reg, test_size=0.3, random_state=42)
     X_val, X_test, y_class_val, y_class_test, y_reg_val, y_reg_test = train_test_split(
-        X_temp, y_class_temp, y_reg_temp, test_size=0.5, random_state=42)
-
-    classifier.fit(X_train, y_class_train)
-
-    y_class_train_pred = classifier.predict(X_train)
-    y_class_val_pred = classifier.predict(X_val)
-    y_class_test_pred = classifier.predict(X_test)
-
-    accuracy_train = accuracy_score(y_class_train, y_class_train_pred)
-    accuracy_test = accuracy_score(y_class_test, y_class_test_pred)
+    X_temp, y_class_temp, y_reg_temp, test_size=0.5, random_state=42)
     
-    if verbose: print("Train and test Classifier Accuracy:", accuracy_train, accuracy_test)
+    if classifier_name == 'Filter':
+        accuracy_train = None
+        accuracy_test = None
+        precision_test = None
+        recall_test = None
+        f1_test = None
 
-    class1_indices_val = y_class_val_pred == 1
-    X_class1_val = X_val[class1_indices_val]
-    y_reg_class1_val = y_reg_val[class1_indices_val]
+        class1_indices_val = np.array(y_class_val) == 1
+        X_class1_val = X_val[class1_indices_val]
+        y_reg_class1_val = y_reg_val[class1_indices_val]
 
-    class1_indices_train = np.array(y_class_train) == 1
-    pct_samples_train = class1_indices_train.sum()/len(class1_indices_train) # fraction of train samples kept
-    X_class1_train = X_train[class1_indices_train]
-    y_reg_class1_train = y_reg_train[class1_indices_train]
+        class1_indices_train = np.array(y_class_train) == 1
+        pct_samples_train = class1_indices_train.sum()/len(class1_indices_train) # fraction of train samples kept
+        X_class1_train = X_train[class1_indices_train]
+        y_reg_class1_train = y_reg_train[class1_indices_train]
 
-    class1_indices_test = np.array(y_class_test_pred) == 1
-    pct_samples_test = class1_indices_test.sum()/len(class1_indices_test) # fraction of test samples kept
-    X_class1_test = X_test[class1_indices_test]
-    y_reg_class1_test = y_reg_test[class1_indices_test]
+        class1_indices_test = np.array(y_class_test) == 1
+        pct_samples_test = class1_indices_test.sum()/len(class1_indices_test) # fraction of test samples kept
+        X_class1_test = X_test[class1_indices_test]
+        y_reg_class1_test = y_reg_test[class1_indices_test]
+    
+    else: 
+        if verbose: print(f"Training classification model {classifier_name}")
+        classifier.fit(X_train, np.array(y_class_train))
+
+        y_class_train_pred = classifier.predict(X_train)
+        y_class_val_pred = classifier.predict(X_val)
+        y_class_test_pred = classifier.predict(X_test)
+
+        accuracy_train = accuracy_score(y_class_train, y_class_train_pred)
+        accuracy_test = accuracy_score(y_class_test, y_class_test_pred)
+        precision_test = precision_score(y_class_test, y_class_test_pred)
+        recall_test = recall_score(y_class_test, y_class_test_pred)
+        f1_test = f1_score(y_class_test, y_class_test_pred)
+        
+        if verbose: print("Train and test Classifier Accuracy:", accuracy_train, accuracy_test)
+
+        class1_indices_val = y_class_val_pred == 1
+        X_class1_val = X_val[class1_indices_val]
+        y_reg_class1_val = y_reg_val[class1_indices_val]
+
+        class1_indices_train = np.array(y_class_train) == 1
+        pct_samples_train = class1_indices_train.sum()/len(class1_indices_train) # fraction of train samples kept
+        X_class1_train = X_train[class1_indices_train]
+        y_reg_class1_train = y_reg_train[class1_indices_train]
+
+        class1_indices_test = np.array(y_class_test_pred) == 1
+        pct_samples_test = class1_indices_test.sum()/len(class1_indices_test) # fraction of test samples kept
+        X_class1_test = X_test[class1_indices_test]
+        y_reg_class1_test = y_reg_test[class1_indices_test]
 
     
     if model_name == 'InceptionTimeE':
@@ -92,7 +115,7 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         
         if not file_exists:
             writer.writerow(["Date", "Model", "Dataset", "White SNR", "ME SNR", "% samples after clf train", "% samples after clf test",
-                             "Accuracy train", "Accuracy test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
+                             "Accuracy train", "Accuracy test", "Precision test", "Recall test", "F1 test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
                               "comment", "params",
                              "y_pred", "y_test"])
         
@@ -107,7 +130,8 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         # Write the data row
         writer.writerow([
             dt.datetime.now(), 
-            model_name, 
+            model_name,
+            classifier_name,
             dataset.split('/')[-1],  # Get the dataset name from the path
             SNR,
             ME, 
@@ -115,6 +139,9 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
             pct_samples_test,
             accuracy_train,
             accuracy_test,
+            precision_test,
+            recall_test,
+            f1_test,
             rmse_train,
             rmse_test, 
             r2_train,
@@ -136,6 +163,10 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
         else:
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}")
             model.save(model_path)
+
+    if classifier_name != 'Filter':
+        from src.visualize.results import conf_matrix
+        conf_matrix(classifier_name, y_class_test, y_class_test_pred, SNR, ME, id=comment)
 
     if model_name.startswith('InceptionTimeE'):
         from src.visualize.training import plot_loss

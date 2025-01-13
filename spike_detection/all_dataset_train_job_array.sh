@@ -12,9 +12,13 @@
 # Initialize Python environment
 source ../irishcream/bin/activate
 
-python spike_detection/train.py --models AveragePrediction LinearRegression ThresholdBased DrCIFRegressor InceptionTimeE InceptionTimeEOriginal --dataset_idx $LSB_JOBINDEX \
-                                --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID" --init_stride 2 --learning_rate 0.0001 
-#python spike_detection/train.py --models LinearRegression ThresholdBased FreshPRINCERegressor DrCIFRegressor InceptionTimeE InceptionTimeEOriginal --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
+python spike_detection/train.py --classification_models Filter --models AveragePrediction LinearRegression ThresholdBased DrCIFRegressor InceptionTimeE InceptionTimeEOriginal --dataset_idx $LSB_JOBINDEX \
+                                --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID" --init_stride -1 --learning_rate 0.0001 
+
+# python spike_detection/train.py --classification_models RandomForestClassifier HIVECOTEV2 --models AveragePrediction --dataset_idx $LSB_JOBINDEX \
+#                                 --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID" 
+
+#python spike_detection/train.py --models LinearRegression ThresholdBased FreshPRINCERegressor DrCIFRegressor InceptionTimeE --dataset_idx $LSB_JOBINDEX --results spike_detection/results.csv --save_model_path models --comment "jobid: $LSB_JOBID"
 
 
 # run with: bsub < spike_detection/all_dataset_train_job_array.sh

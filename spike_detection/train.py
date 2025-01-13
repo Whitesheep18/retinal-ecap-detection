@@ -10,6 +10,7 @@ if __name__ == "__main__":
     from src.utils import sorting_key
 
     parser = argparse.ArgumentParser(description='Train a model on the simulated data')
+    parser.add_argument('--classification_models', type=str, required=True, nargs='*', default='Filter', help='classification model or models to train')
     parser.add_argument('--models', type=str, required=True, nargs='*', default='LinearRegression', help='model or models to train')
     parser.add_argument('--results', type=str, default='results.csv', help='results_file [.csv]')
     parser.add_argument('--save_model_path', type=str, default='False', help='wether to save the model as pickle [<path_to_model>/False]')
@@ -37,6 +38,21 @@ if __name__ == "__main__":
         print("Either dataset or dataset_idx must be given")
         sys.exit(1)
 
+    for classification_model in args.classification_models:
+        if classification_model == "Filter":
+            from src.filter_classification import Filter
+            classifier = Filter()
+        elif classification_model == "RandomForestClassifier":
+            from sklearn.ensemble import RandomForestClassifier
+            classifier = RandomForestClassifier()
+        elif classification_model == "HIVECOTEV2":
+            from aeon.classification.hybrid import HIVECOTEV2
+            classifier = HIVECOTEV2(verbose=1, time_limit_in_minutes = 1)
+        else:
+            print(f"Unknown classifcation model {classification_model}")
+            sys.exit(1)
+
+
     for model in args.models:
         if model == "LinearRegression":
             from sklearn.linear_model import LinearRegression
@@ -49,7 +65,7 @@ if __name__ == "__main__":
             model = FreshPRINCERegressor(verbose=args.verbose, default_fc_parameters='efficient', n_estimators=100)
         elif model == "DrCIFRegressor":        
             from aeon.regression.interval_based import DrCIFRegressor
-            model = DrCIFRegressor(n_estimators=10, min_interval_length= 100, random_state=0)
+            model = DrCIFRegressor(n_estimators=10, min_interval_length= 100)
         elif model == "InceptionTimeE":
             from src.inception_time.model import InceptionTimeE
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs, min_epochs = args.min_n_epochs, learning_rate=args.learning_rate, 
@@ -67,5 +83,5 @@ if __name__ == "__main__":
             print(f"Unknown model {model}")
             sys.exit(1)
 
-        train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
+        train_and_eval(model, classifier, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
 
