@@ -54,6 +54,10 @@ if __name__ == "__main__":
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs, learning_rate=args.learning_rate, 
                                   dropout=args.dropout, l2_penalty=args.l2_penalty, init_stride=args.init_stride,
                                   n_models=args.n_models, optimizer='AdamW')
+        elif model == "InceptionTimeEOriginal":
+            from src.inception_time.model import InceptionTimeE
+            model = InceptionTimeE(verbose=args.verbose, epochs=1500, learning_rate=0.001, 
+                            dropout=0, l2_penalty=0, init_stride=-1, n_models=5, depth=6, filters=32, batch_size=64)
         elif model == "AveragePrediction":
             from src.average_method import AveragePrediction
             model = AveragePrediction()
