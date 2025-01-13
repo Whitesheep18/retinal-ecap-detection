@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import pickle
 from src.inception_time.modules import InceptionModel
+from torch.optim import Adam, AdamW
 from tqdm import tqdm
 
 class InceptionTimeE():
@@ -16,6 +17,7 @@ class InceptionTimeE():
                  epochs = 3,
                  dropout = 0,
                  l2_penalty = 0,
+                 optimizer = 'Adam',
                  verbose=True
                  ):
         
@@ -66,6 +68,7 @@ class InceptionTimeE():
         self.init_stride = init_stride
         self.depth = depth
         self.n_models = n_models
+        self.optimizer = optimizer
         self.train_loss = [[] for i in range(n_models)]
         self.valid_loss = [[] for i in range(n_models)]
 
@@ -148,8 +151,11 @@ class InceptionTimeE():
         for m in range(len(self.models)):
             
             # Define the optimizer.
-            optimizer = torch.optim.Adam(self.models[m].parameters(), lr=self.learning_rate, weight_decay=self.l2_penalty)
-            
+            if self.optimizer == 'Adam':
+                optimizer = Adam(self.models[m].parameters(), lr=self.learning_rate, weight_decay=self.l2_penalty)
+            elif self.optimizer == 'AdamW':
+                optimizer = AdamW(self.models[m].parameters(), lr=self.learning_rate, weight_decay=self.l2_penalty)
+
             # Define the loss function.
             loss_fn = torch.nn.MSELoss()
             
