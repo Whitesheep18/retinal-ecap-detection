@@ -2,7 +2,7 @@ import pickle
 import datetime as dt
 import os
 import numpy as np
-from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score, mean_absolute_percentage_error
+from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score, mean_absolute_percentage_error, recall_score, precision_score, f1_score
 from sklearn.model_selection import train_test_split
 import csv
 
@@ -26,6 +26,9 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
     if classifier_name == 'Filter':
         accuracy_train = None
         accuracy_test = None
+        precision_test = None
+        recall_test = None
+        f1_test = None
 
         class1_indices_val = np.array(y_class_val) == 1
         X_class1_val = X_val[class1_indices_val]
@@ -51,6 +54,9 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
 
         accuracy_train = accuracy_score(y_class_train, y_class_train_pred)
         accuracy_test = accuracy_score(y_class_test, y_class_test_pred)
+        precision_test = precision_score(y_class_test, y_class_test_pred)
+        recall_test = recall_score(y_class_test, y_class_test_pred)
+        f1_test = f1_score(y_class_test, y_class_test_pred)
         
         if verbose: print("Train and test Classifier Accuracy:", accuracy_train, accuracy_test)
 
@@ -102,7 +108,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         
         if not file_exists:
             writer.writerow(["Date", "Model", "Dataset", "White SNR", "ME SNR", "% samples after clf train", "% samples after clf test",
-                             "Accuracy train", "Accuracy test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
+                             "Accuracy train", "Accuracy test", "Precision test", "Recall test", "F1 test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
                               "comment", "params",
                              "y_pred", "y_test"])
         
@@ -126,6 +132,9 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
             pct_samples_test,
             accuracy_train,
             accuracy_test,
+            precision_test,
+            recall_test,
+            f1_test,
             rmse_train,
             rmse_test, 
             r2_train,

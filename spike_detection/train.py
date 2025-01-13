@@ -38,8 +38,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     for classification_model in args.classification_models:
-        if classification_model == "Fliter":
-            classifier = classification_model
+        if classification_model == "Filter":
+            from src.filter_classification import Filter
+            classifier = Filter()
         elif classification_model == "RandomForestClassifier":
             from sklearn.ensemble import RandomForestClassifier
             classifier = RandomForestClassifier()
