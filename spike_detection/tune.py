@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
             # train model
             print('hyperparameters', hp_comb)
-            model = InceptionTime(verbose=args.verbose, epochs=args.n_epochs,n_models=args.n_models, **hp_comb)
+            model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs,n_models=args.n_models, **hp_comb)
             train_and_eval(model, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
             hp_combs.append(hp_comb)
 
