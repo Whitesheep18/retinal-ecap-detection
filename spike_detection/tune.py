@@ -18,13 +18,13 @@ if __name__ == "__main__":
     parser.add_argument('--hp_tune_type', type=str, default='random', choices=['random', 'grid'], help="type of tuning. either 'grid' or 'random' search")
     parser.add_argument('--num_random_hp_comb', type=int, default=5, help="number of HP combinations if hp_tune_type is 'random'")
     # inception time arguments
-    parser.add_argument('--n_models', type=int, default=1, help='number of models in inception time')
+    parser.add_argument('--n_models', type=int, default=1, help='number of models in InceptionTimeE')
     parser.add_argument('--n_epochs', type=int, default=300, help='number of epochs in InceptionTime')
     parser.add_argument('--min_n_epochs_list', type=int, nargs='*', default=[1], help='minimum number of epochs before early stopping in InceptionTime')
     parser.add_argument('--learning_rate_list', type=float, nargs='*', default=[0.0001, 0.001],help='learning rate in InceptionTime')
     parser.add_argument('--dropout_list', type=float, nargs='*', default=[0.2, 0.5, 0.8], help='portion of weights to forget in InceptionTime')
     parser.add_argument('--l2_penalty_list', type=float, nargs='*', default=[0.0001, 0.001], help='l2 penalty in InceptionTime')
-    parser.add_argument('--init_stride_list', type=int, nargs='*', default=[-1, 2], help='stride of initial cnn. If zero or less, no initial cnn is applied')
+    parser.add_argument('--init_stride_list', type=int, nargs='*', default=[-1, 2], help='stride of initial cnn in InceptionTime. If zero or less, no initial cnn is applied')
     args = parser.parse_args()
 
     if args.dataset_idx is not None:

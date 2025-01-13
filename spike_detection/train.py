@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='learning rate in InceptionTime')
     parser.add_argument('--dropout', type=float, default=0.0, help='portion of weights to forget in InceptionTime')
     parser.add_argument('--l2_penalty', type=float, default=0, help='l2 penalty in InceptionTime')
-    parser.add_argument('--init_stride', type=int, default=2, help='rate of initial downsampling CNN in InceptionTime')
+    parser.add_argument('--init_stride', type=int, default=2, help='stride of initial cnn in InceptionTime. If zero or less, no initial cnn is applied')
     args = parser.parse_args()
 
     if args.dataset_idx is not None:
