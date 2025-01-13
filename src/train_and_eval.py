@@ -14,7 +14,14 @@ def train_and_eval(model, dataset, results, save_model_path, verbose=0, comment=
 
     X = np.load(os.path.join(dataset, "X.npy"))
     y_reg = np.load(os.path.join(dataset, "y_reg.npy"))
-    y_class = [0 if value < 5 else 1 for value in y_reg]
+
+    # Deciding of cutoff value for no-activity
+    if verbose: print('Sum y_reg above 60:', (y_reg > 60).sum())
+    if (y_reg > 60).sum() == 0: # very clean DS
+        y_class = [0 if value < 1 else 1 for value in y_reg]
+    else:
+        y_class = [0 if value < 5 else 1 for value in y_reg]
+
 
     SNR = dataset.split('_')[2]
     ME = dataset.split('_')[3]
