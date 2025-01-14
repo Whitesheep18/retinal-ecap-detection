@@ -341,7 +341,7 @@ class InceptionTimeE():
             self.models.append(model.to(params['device']))
             
     def get_params(self):
-        return {'device': self.device,
+        return {'device': self.device.type,
                 'learning_rate': self.learning_rate,
                 'batch_size': self.batch_size,
                 'epochs': self.epochs,
@@ -357,7 +357,7 @@ class InceptionTimeE():
                 }
 
     def set_params(self, params):
-        self.device = params["device"]
+        self.device = torch.device('cuda:0' if params['device']=='cuda' else 'cpu')
         self.learning_rate = params["learning_rate"]
         self.dropout = params["dropout"]
         self.l2_penalty = params["l2_penalty"]
