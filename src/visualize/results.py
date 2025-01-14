@@ -158,7 +158,7 @@ def conf_matrix(classifier_name,  y_true, y_pred, snr_value, me_level, id):
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted Label')
     plt.ylabel('True Label')
-    plt.title(f'Residual Plot for {classifier_name} at White SNR = {snr_value} and ME SNR = {me_level} ')
+    plt.title(f'{classifier_name} at White SNR = {snr_value} and ME SNR = {me_level} ')
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'cm_{id}_{classifier_name}_{snr_value}_{me_level}_{timestamp}'
