@@ -125,7 +125,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         if not file_exists:
             writer.writerow(["Date", "Model", "Classification model", "Dataset", "White SNR", "ME SNR", "% samples after clf train", "% samples after clf test",
                              "Accuracy train", "Accuracy test", "Precision test", "Recall test", "F1 test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
-                              "running time classification", "Running time regression","comment", "params",
+                              "Running time classification", "Running time regression","comment", "params",
                              "y_pred", "y_test"])
         
         y_pred = ', '.join(map(str, y_pred))
