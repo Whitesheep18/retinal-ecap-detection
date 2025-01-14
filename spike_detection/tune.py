@@ -1,16 +1,30 @@
 
+def check_experiment_exists(args, dataset_path, params, tune_results):
+    exists = False
+    for _, row in tune_results.iterrows():
+        p = row['params'] == params
+        d = row['Dataset'] == dataset_path.split('/')[-1]
+        c = row['Classification model'] == args.classification_model
+        if  p and d and c:
+           exists = True
+
+    return exists
+
+
 if __name__ == "__main__":
     import argparse
     import os
     import sys
     from src.train_and_eval import train_and_eval
-    from src.utils import sorting_key
+    from src.utils import sorting_key, switch_quotes
     from src.inception_time.model import InceptionTimeE
     from numpy.random import choice
+    import pandas as pd
+    import json
 
     parser = argparse.ArgumentParser(description='Train a model on the simulated data')
     parser.add_argument('--classification_model', type=str, required=True, choices = ['Filter', 'RandomForestClassifier', 'HIVECOTEV2'], default='Filter', help='classification model or models to train')
-    parser.add_argument('--results', type=str, default='results.csv', help='results_file [.csv]')
+    parser.add_argument('--results', type=str, default='results_tuning.csv', help='results_file [.csv]')
     parser.add_argument('--save_model_path', type=str, default='False', help='wether to save the model as pickle [<path_to_model>/False]')
     parser.add_argument('--dataset', type=str, help='path to dataset folder')
     parser.add_argument('--dataset_idx', type=int, help='index of the dataset in the folder')
@@ -51,6 +65,12 @@ if __name__ == "__main__":
         print(f"Unknown classifcation model {args.classification_model}")
         sys.exit(1)
 
+    if os.path.exists(args.results):
+        tune_results = pd.read_csv(args.results)
+        tune_results['params'] = tune_results['params'].apply(lambda x: json.loads(switch_quotes(x)))
+    else:
+        tune_results = None
+
     if args.hp_tune_type == 'random':
         if args.num_random_hp_comb > len(args.learning_rate_list)*len(args.dropout_list)*len(args.l2_penalty_list):
             print('Too many combinations')
@@ -70,6 +90,16 @@ if __name__ == "__main__":
             # train model
             print('hyperparameters', hp_comb)
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs,n_models=args.n_models, **hp_comb)
+
+            params = model.get_params()
+            print("Params", params)
+
+            if tune_results is not None and check_experiment_exists(args, dataset_path, params, tune_results):
+                print('old model! continuing')
+                continue
+        
+            print('new model!')
+
             train_and_eval(model, classifier, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
             hp_combs.append(hp_comb)
 
@@ -79,11 +109,19 @@ if __name__ == "__main__":
                 for dropout in args.dropout_list:
                     for l2_penalty in args.l2_penalty_list:
                         for init_stride in args.init_stride_list:
+
                             model = InceptionTimeE(verbose=args.verbose, n_models=args.n_models, epochs=args.n_epochs, min_epochs = min_n_epochs,
                                                 learning_rate=learning_rate, dropout=dropout, l2_penalty=l2_penalty, init_stride=init_stride)
+                            
+                            params = model.get_params()
+                            print("Params", params)
+                            
+                            if tune_results is not None and check_experiment_exists(args, dataset_path, params, tune_results):
+                                print('old model! continuing')
+                                continue
+                        
+                            print('new model!')
+
                             train_and_eval(model, classifier, dataset_path, args.results, args.save_model_path, verbose=args.verbose, comment=args.comment)
     else:
         print("Unknown hp_tune_type. Choose")
-
-
-
