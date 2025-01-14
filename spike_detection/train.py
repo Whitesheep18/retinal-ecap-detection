@@ -70,12 +70,12 @@ if __name__ == "__main__":
             from src.inception_time.model import InceptionTimeE
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs, min_epochs = args.min_n_epochs, learning_rate=args.learning_rate, 
                                   dropout=args.dropout, l2_penalty=args.l2_penalty, init_stride=args.init_stride,
-                                  n_models=args.n_models, optimizer='AdamW')
+                                  n_models=args.n_models, depth=6, filters=32, batch_size=64, optimizer='AdamW')
         elif model == "InceptionTimeEOriginal":
             from src.inception_time.model import InceptionTimeE
             n_epochs = 1500
             model = InceptionTimeE(verbose=args.verbose, epochs=n_epochs, min_epochs=n_epochs+1, learning_rate=0.001, 
-                            dropout=0, l2_penalty=0, init_stride=-1, n_models=5, depth=6, filters=32, batch_size=64)
+                            dropout=0, l2_penalty=0, init_stride=-1, n_models=5, depth=6, filters=32, batch_size=64, optimizer='Adam')
         elif model == "AveragePrediction":
             from src.average_method import AveragePrediction
             model = AveragePrediction()

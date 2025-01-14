@@ -89,7 +89,8 @@ if __name__ == "__main__":
 
             # train model
             print('hyperparameters', hp_comb)
-            model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs,n_models=args.n_models, **hp_comb)
+            model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs,n_models=args.n_models, 
+                                  depth=6,filters=32,batch_size=64,optimizer='AdamW',**hp_comb)
 
             params = model.get_params()
             print("Params", params)
@@ -111,7 +112,8 @@ if __name__ == "__main__":
                         for init_stride in args.init_stride_list:
 
                             model = InceptionTimeE(verbose=args.verbose, n_models=args.n_models, epochs=args.n_epochs, min_epochs = min_n_epochs,
-                                                learning_rate=learning_rate, dropout=dropout, l2_penalty=l2_penalty, init_stride=init_stride)
+                                                learning_rate=learning_rate, dropout=dropout, l2_penalty=l2_penalty, init_stride=init_stride,
+                                                depth=6, filters=32, batch_size=64, optimizer='AdamW')
                             
                             params = model.get_params()
                             print("Params", params)
