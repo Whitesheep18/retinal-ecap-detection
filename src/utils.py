@@ -84,3 +84,7 @@ def save_figure(name, figdir=None, width=6, height=4):
     plt.gcf().set_size_inches(width, height)
     plt.savefig(filepath, bbox_inches='tight')
     plt.close()
+
+
+def switch_quotes(x):
+    return x.replace("'", '"')
