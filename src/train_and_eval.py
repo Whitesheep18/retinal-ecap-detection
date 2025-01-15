@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.metrics import r2_score, root_mean_squared_error, accuracy_score, mean_absolute_percentage_error, recall_score, precision_score, f1_score
 from sklearn.model_selection import train_test_split
 import csv
+import time
 
 def train_and_eval(model, classifier, dataset, results, save_model_path, verbose=0, comment=''):
     
@@ -30,6 +31,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
     X_val, X_test, y_class_val, y_class_test, y_reg_val, y_reg_test = train_test_split(
     X_temp, y_class_temp, y_reg_temp, test_size=0.5, random_state=42)
     
+    start_time_classification = time.time()
     if classifier_name == 'Filter':
         accuracy_train = None
         accuracy_test = None
@@ -81,7 +83,10 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         X_class1_test = X_test[class1_indices_test]
         y_reg_class1_test = y_reg_test[class1_indices_test]
 
-    
+    end_time_classification = time.time()
+    elapsed_time_classification = end_time_classification - start_time_classification
+    start_time_regression = time.time()
+
     if model_name == 'InceptionTimeE':
         model.fit(X_class1_train, y_reg_class1_train, X_class1_val, y_reg_class1_val)
     else: 
@@ -97,6 +102,9 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         y_pred_train = model.predict(X_class1_train)
         y_pred = model.predict(X_class1_test)
 
+
+    end_time_regression = time.time()
+    elapsed_time_regression = end_time_regression - start_time_regression
     if verbose: print("Evaluating model")
 
     r2_train = r2_score(y_reg_class1_train, y_pred_train)
@@ -106,6 +114,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
     r2_test = r2_score(y_reg_class1_test, y_pred)
     rmse_test = root_mean_squared_error(y_reg_class1_test, y_pred)
     mape_test = mean_absolute_percentage_error(y_reg_class1_test, y_pred)
+    
 
     if verbose: print(f"Train and test RMSE: {rmse_train}, {rmse_test}, R2: {r2_train}, {r2_test}, MAPE: {mape_train}, {mape_test}")
 
@@ -116,7 +125,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         if not file_exists:
             writer.writerow(["Date", "Model", "Classification model", "Dataset", "White SNR", "ME SNR", "% samples after clf train", "% samples after clf test",
                              "Accuracy train", "Accuracy test", "Precision test", "Recall test", "F1 test", "RMSE train", "RMSE test", "R2 train", "R2 test", "MAPE train", "MAPE test",
-                              "comment", "params",
+                              "Running time classification", "Running time regression","comment", "params",
                              "y_pred", "y_test"])
         
         y_pred = ', '.join(map(str, y_pred))
@@ -148,6 +157,8 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
             r2_test, 
             mape_train,
             mape_test,
+            elapsed_time_classification,
+            elapsed_time_regression,
             comment,
             params,
             y_pred,
