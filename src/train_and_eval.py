@@ -177,7 +177,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
 
     if classifier_name != 'Filter':
         from src.visualize.results import conf_matrix
-        conf_matrix(classifier_name, y_class_test, y_class_test_pred, SNR, ME, id=comment)
+        conf_matrix(classifier_name, y_class_test, y_class_test_pred, SNR, ME, id=comment, height=2.5, width=3)
 
     if model_name.startswith('InceptionTimeE'):
         from src.visualize.training import plot_loss
