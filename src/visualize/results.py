@@ -154,7 +154,7 @@ def conf_matrix(classifier_name,  y_true, y_pred, snr_value, me_level, id):
     class_names = ['No activity', 'Activity present']
 
     # Plot confusion matrix
-    plt.figure(figsize=(4, 3.5))
+    plt.figure(figsize=(3, 2.5))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted Label')
     plt.ylabel('True Label')
