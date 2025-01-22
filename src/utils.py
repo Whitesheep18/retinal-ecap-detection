@@ -4,6 +4,25 @@ import os
 import re
 import matplotlib.pyplot as plt
 
+
+eye_experiment_sa_start = {'2D': 
+                        {1:{'TTX': 1830, 'stimulated': 1940, 'non-stimulated': 0},
+                        2:{'TTX': 2095, 'stimulated': 1790, 'non-stimulated': 0},
+                        3:{'TTX': 2105, 'stimulated': 155, 'non-stimulated': 0},
+                        4:{'TTX': 2865, 'stimulated': 2585, 'non-stimulated': 0}, # SA looks weird in both
+                        5:{'TTX': 455, 'stimulated': 690, 'non-stimulated': 0},
+                        6:{'TTX': 1795, 'stimulated': 1495, 'non-stimulated': 0},
+                        },
+                        '3D':                        
+                        {1:{'TTX': 1900, 'stimulated': 905, 'non-stimulated': 0},
+                        2:{'TTX': 1760, 'stimulated': 430, 'non-stimulated': 0},
+                        3:{'TTX': 2800, 'stimulated': 1850,'non-stimulated': 0},
+                        4:{'TTX': 600, 'stimulated': 480, 'non-stimulated': 0},
+                        5:{'TTX': 280, 'stimulated': 2635, 'non-stimulated': 0},
+                        6:{'TTX': 1380, 'stimulated': 1455, 'non-stimulated': 0},
+                        }
+                        }
+
 def get_signal(filepath='../data/10Hz_1V_neg500mV_1ms003.ns5', verbose=1):
     reader = neo.io.BlackrockIO(filename=filepath)
     if verbose: print("No. blocks", reader.block_count())
@@ -88,3 +107,4 @@ def save_figure(name, figdir=None, width=6, height=4):
 
 def switch_quotes(x):
     return x.replace("'", '"')
+
