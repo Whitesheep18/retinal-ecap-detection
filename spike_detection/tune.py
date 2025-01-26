@@ -35,6 +35,7 @@ if __name__ == "__main__":
     # inception time arguments
     parser.add_argument('--n_models', type=int, default=1, help='number of models in InceptionTimeE')
     parser.add_argument('--n_epochs', type=int, default=300, help='number of epochs in InceptionTime')
+    parser.add_argument('--depth', type=int, default=6, help='number of layers in inceptionTime')
     parser.add_argument('--min_n_epochs_list', type=int, nargs='*', default=[1], help='minimum number of epochs before early stopping in InceptionTime')
     parser.add_argument('--learning_rate_list', type=float, nargs='*', default=[0.0001, 0.001],help='learning rate in InceptionTime')
     parser.add_argument('--dropout_list', type=float, nargs='*', default=[0.2, 0.5, 0.8], help='portion of weights to forget in InceptionTime')
@@ -90,7 +91,7 @@ if __name__ == "__main__":
             # train model
             print('hyperparameters', hp_comb)
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs,n_models=args.n_models, 
-                                  depth=6,filters=32,batch_size=64,optimizer='AdamW',**hp_comb)
+                                  depth=args.depth,filters=32,batch_size=64,optimizer='AdamW',**hp_comb)
 
             params = model.get_params()
             print("Params", params)
@@ -113,7 +114,7 @@ if __name__ == "__main__":
 
                             model = InceptionTimeE(verbose=args.verbose, n_models=args.n_models, epochs=args.n_epochs, min_epochs = min_n_epochs,
                                                 learning_rate=learning_rate, dropout=dropout, l2_penalty=l2_penalty, init_stride=init_stride,
-                                                depth=6, filters=32, batch_size=64, optimizer='AdamW')
+                                                depth=args.depth, filters=32, batch_size=64, optimizer='AdamW')
                             
                             params = model.get_params()
                             print("Params", params)
