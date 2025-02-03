@@ -166,6 +166,11 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         ])
     
     if save_model_path != "False":
+        if classifier_name != 'Filter':
+            clf_model_path = os.path.join(save_model_path, f"{classifier_name}_{os.path.basename(dataset)}.pkl")
+            print('Saving classification model to', clf_model_path)
+            with open(clf_model_path, "wb") as f:
+                pickle.dump(model, f)
         if 'inception' not in model_name.lower():
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}.pkl")
             print('Saving model to', model_path)
