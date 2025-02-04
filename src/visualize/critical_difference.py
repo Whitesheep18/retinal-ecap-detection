@@ -461,8 +461,12 @@ def qvalue(pvals, threshold=0.05, verbose=True):
     qvals = qvals[rev_ind]
     return significant, qvals
 
-df_perf = pd.read_csv('results/intermediate_tuning_results.csv', index_col=False)
-#df_perf = pd.read_csv('results/othermodels_r1.csv', index_col=False)
+
+df_perf = pd.concat([pd.read_csv('results/othermodels_r1.csv', index_col=False), 
+                     pd.read_csv('results/othermodels_r2.csv', index_col=False),
+                     pd.read_csv('results/othermodels_r3.csv', index_col=False)])
+df_perf = df_perf[['Model', 'Dataset', 'RMSE test']]
+df_perf = df_perf.groupby(['Model', 'Dataset']).mean().reset_index()
 df_perf['RMSE test'] = df_perf['RMSE test']*(-1) # now the higher the better
 
-draw_cd_diagram(df_perf=df_perf, alpha=0.05, method=None, title='Average RMSE rank across datasets', labels=True)
+draw_cd_diagram(df_perf=df_perf, alpha=0.05, method='hopf', title='Average RMSE rank across datasets', labels=True)
