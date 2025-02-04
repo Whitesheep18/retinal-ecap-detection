@@ -149,7 +149,7 @@ def residual_plot_individual(y_individual, y_test):
     save_figure(name=filename, figdir='./plots')
 
 
-def conf_matrix(classifier_name,  y_true, y_pred, snr_value, me_level, id):
+def conf_matrix(classifier_name,  y_true, y_pred, snr_value, me_level, id, height, width):
     cm = confusion_matrix(y_true, y_pred)
     class_names = ['No activity', 'Activity present']
 
@@ -162,10 +162,10 @@ def conf_matrix(classifier_name,  y_true, y_pred, snr_value, me_level, id):
     plt.grid(True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'cm_{id}_{classifier_name}_{snr_value}_{me_level}_{timestamp}'
-    save_figure(name=filename, figdir='./plots')
+    save_figure(name=filename, figdir='./plots', height=height, width=width)
     
 
-
-RMSE_SNR_plot('spike_detection/results.csv', me_level=80, y_range=None)
-#pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=10)
-#residual_plot('spike_detection/results.csv', 'InceptionTime', 80, me_level=10)
+if __name__ == '__main__':
+    RMSE_SNR_plot('spike_detection/results.csv', me_level=80, y_range=None)
+    #pred_test_plot('spike_detection/results.csv', 'DrCIFRegressor', me_level=10)
+    #residual_plot('spike_detection/results.csv', 'InceptionTime', 80, me_level=10)
