@@ -82,7 +82,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         classification_model_path = os.path.join(save_model_path, f"{classifier_name}_{os.path.basename(dataset)}.pkl")
         if load_model and os.path.isfile(classification_model_path):
             if verbose: print(f"Loading classification model {classifier_name}")
-            
+
             with open(classification_model_path, "rb") as f:
                 classifier = pickle.load(f)
         else:
@@ -202,7 +202,7 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
             clf_model_path = os.path.join(save_model_path, f"{classifier_name}_{os.path.basename(dataset)}.pkl")
             print('Saving classification model to', clf_model_path)
             with open(clf_model_path, "wb") as f:
-                pickle.dump(model, f)
+                pickle.dump(classifier, f)
         if 'inception' not in model_name.lower():
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}.pkl")
             print('Saving model to', model_path)
