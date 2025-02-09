@@ -7,7 +7,32 @@ from sklearn.model_selection import train_test_split
 import csv
 import time
 
-def train_and_eval(model, classifier, dataset, results, save_model_path, verbose=0, comment=''):
+def train_and_eval(model, classifier, dataset, results, save_model_path, verbose=0, comment='', load_model=True):
+    """
+    Train and evaluate a model on a dataset. The model is trained on the samples that are classified as active by the classifier.
+    The model is evaluated on the test set, which is also classified as active by the classifier.
+    The results are saved in a csv file.
+
+    Parameters
+    ----------
+    model : object
+        The model to train and evaluate.
+    classifier : object
+        The classifier to use to classify the samples as active or not.
+    dataset : str
+        The path to the dataset.
+    results : str
+        The path to the results file.
+    save_model_path : str
+        The path to save the trained model.
+    verbose : int   
+        The verbosity level.
+    comment : str
+        A comment to add to the results file. Usually jobid
+    load_classifier : bool
+        Whether to load the classification model from the save_model_path. 
+        If no models found, train new models.
+    """
     
     model_name = model.__class__.__name__
     classifier_name = classifier.__class__.__name__
@@ -54,8 +79,15 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         y_reg_class1_test = y_reg_test[class1_indices_test]
     
     else: 
-        if verbose: print(f"Training classification model {classifier_name}")
-        classifier.fit(X_train, np.array(y_class_train))
+        classification_model_path = os.path.join(save_model_path, f"{classifier_name}_{os.path.basename(dataset)}.pkl")
+        if load_model and os.path.isfile(classification_model_path):
+            if verbose: print(f"Loading classification model {classifier_name}")
+
+            with open(classification_model_path, "rb") as f:
+                classifier = pickle.load(f)
+        else:
+            if verbose: print(f"Training classification model {classifier_name}")
+            classifier.fit(X_train, np.array(y_class_train))
 
         y_class_train_pred = classifier.predict(X_train)
         y_class_val_pred = classifier.predict(X_val)
@@ -166,6 +198,11 @@ def train_and_eval(model, classifier, dataset, results, save_model_path, verbose
         ])
     
     if save_model_path != "False":
+        if classifier_name != 'Filter':
+            clf_model_path = os.path.join(save_model_path, f"{classifier_name}_{os.path.basename(dataset)}.pkl")
+            print('Saving classification model to', clf_model_path)
+            with open(clf_model_path, "wb") as f:
+                pickle.dump(classifier, f)
         if 'inception' not in model_name.lower():
             model_path = os.path.join(save_model_path, f"{model_name}_{os.path.basename(dataset)}.pkl")
             print('Saving model to', model_path)

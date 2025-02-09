@@ -205,7 +205,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
               (textspace - 0.1, chei)],
              linewidth=linewidth)
         if labels:
-            text(textspace + 0.3, chei - 0.075, format(ssums[i], '.4f'), ha="right", va="center", size=10)
+            text(textspace + 0.3, chei - 0.075, format(ssums[i], '.2f'), ha="right", va="center", size=10)
         text(textspace - 0.2, chei, filter_names(nnames[i]), ha="right", va="center", size=16)
 
     for i in range(math.ceil(k / 2), k):
@@ -215,7 +215,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
               (textspace + scalewidth + 0.1, chei)],
              linewidth=linewidth)
         if labels:
-            text(textspace + scalewidth - 0.3, chei - 0.075, format(ssums[i], '.4f'), ha="left", va="center", size=10)
+            text(textspace + scalewidth - 0.3, chei - 0.075, format(ssums[i], '.2f'), ha="left", va="center", size=10)
         text(textspace + scalewidth + 0.2, chei, filter_names(nnames[i]),
              ha="left", va="center", size=16)
 
@@ -242,6 +242,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
     achieved_half = False
     #print(nnames)
     for clq in cliques:
+        print(clq)
         if len(clq) == 1:
             continue
         #print(clq)
@@ -271,16 +272,19 @@ def form_cliques(p_values, nnames):
             max_j = max(i, j)
             g_data[min_i, max_j] = 1
 
+    print()
+    print(g_data)
+
     g = networkx.Graph(g_data)
     return networkx.find_cliques(g)
 
 
-def draw_cd_diagram(df_perf=None, alpha=0.05, title=None, labels=False):
+def draw_cd_diagram(df_perf=None, alpha=0.05, method='fdr', title=None, labels=False):
     """
     Draws the critical difference diagram given the list of pairwise regressors that are
     significant or not
     """
-    p_values, average_ranks, _ = wilcoxon_holm(df_perf=df_perf, alpha=alpha)
+    p_values, average_ranks, _ = multiple_wilcoxon(df_perf=df_perf, method=method, alpha=alpha)
 
     #print(average_ranks)
 
@@ -300,7 +304,7 @@ def draw_cd_diagram(df_perf=None, alpha=0.05, title=None, labels=False):
         plt.title(title,fontdict=font, y=0.9, x=0.5)
     plt.savefig('cd-diagram.png',bbox_inches='tight')
 
-def wilcoxon_holm(alpha=0.05, df_perf=None):
+def multiple_wilcoxon(alpha=0.05, method='fdr', df_perf=None):
     """
     Applies the wilcoxon signed rank test between each pair of algorithm and then use Holm
     to reject the null's hypothesis
@@ -345,19 +349,38 @@ def wilcoxon_holm(alpha=0.05, df_perf=None):
             p_values.append((regressor_1, regressor_2, p_value, False))
     # get the number of hypothesis
     k = len(p_values)
-    # sort the list in acsending manner of p-value
-    p_values.sort(key=operator.itemgetter(2))
+
 
     # loop through the hypothesis
-    for i in range(k):
-        # correct alpha with holm
-        new_alpha = float(alpha / (k - i))
-        # test if significant after holm's correction of alpha
-        if p_values[i][2] <= new_alpha:
-            p_values[i] = (p_values[i][0], p_values[i][1], p_values[i][2], True)
-        else:
-            # stop
-            break
+    if method == 'holm':
+        # sort the list in acsending manner of p-value
+        p_values.sort(key=operator.itemgetter(2))
+            
+        for i in range(k):
+            # correct alpha with holm
+            new_alpha = float(alpha / (k - i))
+            # test if significant after holm's correction of alpha
+            if p_values[i][2] <= new_alpha:
+                p_values[i] = (p_values[i][0], p_values[i][1], p_values[i][2], True)
+            else:
+                # stop
+                break
+
+    elif method == 'fdr':
+        significant, qvals = qvalue([p[2] for p in p_values], threshold=alpha, verbose=False)
+
+        for i in range(k):
+            if significant[i]:
+                p_values[i] = (p_values[i][0], p_values[i][1], qvals[i], True)
+    else:
+        for i in range(len(p_values)):
+            if p_values[i][2] < alpha:
+                p_values[i] = (p_values[i][0], p_values[i][1], p_values[i][2], True)
+
+    print(p_values)
+
+    
+
     # compute the average ranks to be returned (useful for drawing the cd diagram)
     # sort the dataframe of performances
     sorted_df_perf = df_perf.loc[df_perf['Model'].isin(regressors)]. \
@@ -375,7 +398,75 @@ def wilcoxon_holm(alpha=0.05, df_perf=None):
     return p_values, average_ranks, max_nb_datasets
 
 
-df_perf = pd.read_csv('../results/othermodels_r1.csv', index_col=False)
+def qvalue(pvals, threshold=0.05, verbose=True):
+    from scipy.interpolate import UnivariateSpline
+    """
+    Adapted from multipy package
+    Function for estimating q-values from p-values using the Storey-
+    Tibshirani q-value method (2003).
+
+    Input arguments:
+    ================
+    pvals       - P-values corresponding to a family of hypotheses.
+    threshold   - Threshold for deciding which q-values are significant.
+
+    Output arguments:
+    =================
+    significant - An array of flags indicating which p-values are significant.
+    qvals       - Q-values corresponding to the p-values.
+    """
+
+    """Count the p-values. Find indices for sorting the p-values into
+    ascending order and for reversing the order back to original."""
+    m, pvals = len(pvals), np.asarray(pvals)
+    ind = np.argsort(pvals)
+    rev_ind = np.argsort(ind)
+    pvals = pvals[ind]
+
+    # Estimate proportion of features that are truly null.
+    kappa = np.arange(0, 0.96, 0.01)
+    pik = [sum(pvals > k) / (m*(1-k)) for k in kappa]
+    cs = UnivariateSpline(kappa, pik, k=3, s=None, ext=0)
+    pi0 = float(cs(1.))
+    if (verbose):
+        print('The estimated proportion of truly null features is %.3f' % pi0)
+
+    """The smoothing step can sometimes converge outside the interval [0, 1].
+    This was noted in the published literature at least by Reiss and
+    colleagues [4]. There are at least two approaches one could use to
+    attempt to fix the issue:
+    (1) Set the estimate to 1 if it is outside the interval, which is the
+        assumption in the classic FDR method.
+    (2) Assume that if pi0 > 1, it was overestimated, and if pi0 < 0, it
+        was underestimated. Set to 0 or 1 depending on which case occurs.
+
+    Here we have chosen the first option, since it is the more conservative
+    one of the two.
+    """
+    if (pi0 < 0 or pi0 > 1):
+        pi0 = 1
+        print('Smoothing estimator did not converge in [0, 1]')
+
+    # Compute the q-values.
+    qvals = np.zeros(np.shape(pvals))
+    qvals[-1] = pi0*pvals[-1]
+    for i in range(m-2, -1, -1):
+        qvals[i] = min(pi0*m*pvals[i]/float(i+1), qvals[i+1])
+
+    # Test which p-values are significant.
+    significant = np.zeros(np.shape(pvals), dtype='bool')
+    significant[ind] = qvals<threshold
+
+    """Order the q-values according to the original order of the p-values."""
+    qvals = qvals[rev_ind]
+    return significant, qvals
+
+
+df_perf = pd.concat([pd.read_csv('results/othermodels_r1.csv', index_col=False), 
+                     pd.read_csv('results/othermodels_r2.csv', index_col=False),
+                     pd.read_csv('results/othermodels_r3.csv', index_col=False)])
+df_perf = df_perf[['Model', 'Dataset', 'RMSE test']]
+df_perf = df_perf.groupby(['Model', 'Dataset']).mean().reset_index()
 df_perf['RMSE test'] = df_perf['RMSE test']*(-1) # now the higher the better
 
-draw_cd_diagram(df_perf=df_perf, title='Average RMSE rank across datasets', labels=True)
+draw_cd_diagram(df_perf=df_perf, alpha=0.05, method='hopf', title='Average RMSE rank across datasets', labels=True)
