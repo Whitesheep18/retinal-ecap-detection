@@ -65,7 +65,7 @@ if __name__ == "__main__":
             model = FreshPRINCERegressor(verbose=args.verbose, default_fc_parameters='efficient', n_estimators=100)
         elif model == "DrCIFRegressor":        
             from aeon.regression.interval_based import DrCIFRegressor
-            model = DrCIFRegressor(n_estimators=10, min_interval_length= 100)
+            model = DrCIFRegressor(n_estimators=100, min_interval_length= 100)
         elif model == "InceptionTimeE":
             from src.inception_time.model import InceptionTimeE
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs, min_epochs = args.min_n_epochs, learning_rate=args.learning_rate, 
