@@ -26,6 +26,7 @@ if __name__ == "__main__":
     parser.add_argument('--dropout', type=float, default=0.0, help='portion of weights to forget in InceptionTime')
     parser.add_argument('--l2_penalty', type=float, default=0, help='l2 penalty in InceptionTime')
     parser.add_argument('--init_stride', type=int, default=2, help='stride of initial cnn in InceptionTime. If zero or less, no initial cnn is applied')
+    parser.add_argument('--depth', type=int, default=6, help='number of inception layers in InceptionTime')
     args = parser.parse_args()
 
     if args.dataset_idx is not None:
@@ -70,7 +71,7 @@ if __name__ == "__main__":
             from src.inception_time.model import InceptionTimeE
             model = InceptionTimeE(verbose=args.verbose, epochs=args.n_epochs, min_epochs = args.min_n_epochs, learning_rate=args.learning_rate, 
                                   dropout=args.dropout, l2_penalty=args.l2_penalty, init_stride=args.init_stride,
-                                  n_models=args.n_models, depth=6, filters=32, batch_size=64, optimizer='AdamW')
+                                  n_models=args.n_models, depth=args.depth, filters=32, batch_size=64, optimizer='AdamW')
         elif model == "InceptionTimeEOriginal":
             from src.inception_time.model import InceptionTimeE
             n_epochs = 1500
