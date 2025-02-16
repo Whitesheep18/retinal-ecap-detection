@@ -11,14 +11,16 @@ counting methods used for performance evaluation. Due to the extreme noise and i
 experimental data, synthetic datasets were created, designed to emulate the characteristics of the ex-
 perimental data, allowing the use of supervised methods. The 12 synthetic datasets with varying noise
 levels enabled model evaluation under different conditions, addressing the unknown noise level in the
-experimental data.
+experimental data.  
+  
 To count action potentials in retinal ganglion cells, a two-phase solution pipeline is proposed. The
 first stage involves classifying whether cellular activity is present or not, while the second estimates the
 number of action potentials in the sample using regression. Both baseline and advanced methods are
 employed for these tasks. The results demonstrate that advanced models outperform baseline methods
 in both classification and regression. For classification, the state-of-the-art model HIVE-COTE-V2 per-
 formed significantly better than Random Forest with an F1-score of 0.96 ± 0.01 across all simulated
-datasets, albeit with a higher computational cost.
+datasets, albeit with a higher computational cost.  
+  
 For the regression stage, the study investigated if a modified version of InceptionTimeE designed with
 specific alterations to suit the requirements of spike counting better, could outperform off-the-shelf
 state-of-the-art methods for time series extrinsic regression. The proposed method was on par with
@@ -63,7 +65,7 @@ bsub < spike_detection/all_dataset_train_job_array.sh
 ```
 You'll find results in `spike_detection/results.csv` which can be visualized using `src/visualize/results.py`
 
-<span style="font-size: 8px;">*Irish cream is the suggested type of tea for this exercise</span>
+<span style="font-size: 4px;">*Irish cream is the suggested type of tea for this exercise</span>
 
 
 ## Acknowledgements
