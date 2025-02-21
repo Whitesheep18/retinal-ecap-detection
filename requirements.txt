@@ -1,8 +1,10 @@
+-e .
 pandas
-aeon
 tsfresh
-tensorflow
+aeon
 torch
 sktime
+seaborn
 matplotlib
 bokeh
+neo
