@@ -76,6 +76,47 @@ def pred_test_plot(csv_file_path, model_name, me_level=None, snr_levels=None):
     filename = f'{model_name}_y_test_y_pred_plot_{timestamp}'
     save_figure(name=filename, figdir='./plots')
 
+def pred_test_plot_individual(y_individual, y_test):
+    # Ensure y_test is a 1D array.
+    y_test = np.asarray(y_test).flatten()
+
+    # Ensure shapes match for subtraction.
+    if y_test.shape[0] != y_individual.shape[0]:
+        raise ValueError(f"Shape mismatch: y_test has shape {y_test.shape}, but y_individual has shape {y_individual.shape}")
+
+    # Calculate residuals for each model.
+    y_individual = np.squeeze(y_individual)
+
+    # Number of models.
+    num_models = y_individual.shape[1]
+
+    # Define a list of colors for each model using a colormap
+    colors = plt.cm.get_cmap('tab10', 10)  # Use tab20 for more distinct colors if you have more than 10 models
+    
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    
+    # Plot residuals for each model against y_test.
+    for model_idx in range(num_models):
+        plt.scatter(
+            y_test,                     # True labels (x-axis)
+            y_individual[:, model_idx],    # Residuals for the current model (y-axis)
+            label=f'Model {model_idx + 1}',
+            alpha=0.7,
+            s=10,                       # Marker size
+            color=colors(model_idx)     # Use the color from the colormap
+        )
+
+    plt.title("Individual Model Predictions vs. True values")
+    plt.xlabel("True values")
+    plt.ylabel("Predicted values")
+    plt.legend(loc='upper right', fontsize=8)
+    plt.tight_layout()
+
+    # Save the plot to file
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+    filename = f'Individual_InceptionTimeE_y_test_y_pred_plot_{timestamp}'
+    save_figure(name=filename, figdir='./plots')
 
 def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
     data = pd.read_csv(csv_file_path)
@@ -104,6 +145,7 @@ def residual_plot(csv_file_path, model_name, snr_value, me_level=None):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'{model_name}_residual_plot_{snr_value}_{timestamp}'
     save_figure(name=filename, figdir='./plots')
+
 
 
 def residual_plot_individual(y_individual, y_test):
@@ -138,14 +180,15 @@ def residual_plot_individual(y_individual, y_test):
         )
 
     plt.axhline(0, color='black', linestyle='--', linewidth=1, label='Zero Residual')
-    plt.title("Residuals of Individual Model Predictions vs. y_test")
-    plt.xlabel("y_test (True Labels)")
+    plt.title("Residuals of Individual Model Predictions vs. True values")
+    plt.xlabel("True values")
     plt.ylabel("Residuals")
     plt.legend(loc='upper right', fontsize=8)
     plt.tight_layout()
 
     # Save the plot to file
-    filename = 'res'
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+    filename = f'Individual InceptionTimeE_residual_plot_{timestamp}'
     save_figure(name=filename, figdir='./plots')
 
 

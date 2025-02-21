@@ -382,12 +382,25 @@ if __name__ == '__main__':
     dataset = 'simulated_data/DS_80_80_10'
     X = np.load(os.path.join(dataset, "X.npy"))
     y = np.load(os.path.join(dataset, "y_reg.npy"))
+    print(len(y))
+    y_mask = y > 5
+    print(y_mask.sum())
+    X = X[y_mask]
+    y = y[y_mask]
 
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
-    model = InceptionTimeE(n_models = 3, epochs=150, init_stride=2, depth=6, dropout=0.0, learning_rate=0.0001)
+    model = InceptionTimeE(n_models = 5, epochs=1500, min_epochs=800, init_stride=-1,
+                           depth=6, dropout=0.0, learning_rate=0.0001, l2_penalty=0.001)
+    
+    model._build_models()
+
+    print("# params")
+    print(sum(p.numel() for p in model.models[0].parameters()))
+
+    quit()
     model.fit(X_train, y_train, X_val, y_val)
     print('fit ok')
     y_pred, y_individual = model.predict(X_test)
@@ -397,8 +410,9 @@ if __name__ == '__main__':
     from src.visualize.training import plot_loss
     plot_loss(model.train_loss, model.valid_loss)
     # print(y_pred)
-    from src.visualize.results import residual_plot_individual
+    from src.visualize.results import residual_plot_individual, pred_test_plot_individual
     residual_plot_individual(y_test=y_test, y_individual=y_individual)
+    pred_test_plot_individual(y_test=y_test, y_individual=y_individual)
 
     # model.save('../../models/InceptionTime_DS_80_10_10')
 
